@@ -6,16 +6,27 @@ function App() {
 
   return (
     <div className='app-container'>
-      <div>search bar</div>
-        <PanelGroup className='center-container' direction="horizontal">
-          <Panel className='side-panel' collapsible={true} collapsedSize={4} defaultSize={25} minSize={15} maxSize={35}>
-            left
-          </Panel>
-          <PanelResizeHandle className='resize-handle' style={{width: "6px"}}/>
-          <Panel className="main-container" defaultSize={75} minSize={65}>
-            middle
-          </Panel>
-        </PanelGroup>
+      <div className='header-bar'>
+        <div className='quick-nav'>
+          <i className="bi bi-chevron-left"></i>
+          <i className="bi bi-chevron-right"></i>
+          <i className="bi bi-arrow-clockwise"></i>
+        </div>
+        <input className="search-bar" type="text" />
+        <div className='user-account'>
+          <i class="bi bi-person-circle"></i>
+          <div>Your Name</div>
+        </div>
+      </div>
+      <PanelGroup className='center-container' direction="horizontal">
+        <Panel className='side-panel' collapsible={true} collapsedSize={4} defaultSize={25} minSize={15} maxSize={35}>
+          left
+        </Panel>
+        <PanelResizeHandle className='resize-handle' style={{width: "6px"}}/>
+        <Panel className="main-container" defaultSize={75} minSize={65}>
+          middle
+        </Panel>
+      </PanelGroup>
       <div className='bottom-player'>
         <audio src=""></audio>
         <div className='left-infos'>

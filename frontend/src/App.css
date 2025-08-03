@@ -98,3 +98,34 @@
   gap: 10px;
   align-items: center;
 }
+
+
+
+/* TODO create a new file for this too */
+.header-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+.header-bar > .quick-nav {
+  width: fit-content;
+  margin-left: 10px;
+  font-size: x-large;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-account {
+  margin-right: 10px;
+
+  width: fit-content;
+  justify-self: right;
+  font-size: x-large;
+
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}

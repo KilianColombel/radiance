@@ -1,4 +1,9 @@
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
 :root {
+  --player-height: 100px;
+  --header-height: 50px;
+
   --background-color: rgb(122, 122, 122);
   --text-color: white;
   --font: medium monospace;
@@ -9,7 +14,7 @@ html, body {
   margin: 0;
   height: 100%;
   width: 100%;
-  
+
   background-color: var(--background-color);
   color: var(--text-color);
   font: var(--font);

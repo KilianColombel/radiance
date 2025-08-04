@@ -14,12 +14,12 @@ function App() {
         </div>
         <input className="search-bar" type="text" />
         <div className='user-account'>
-          <i class="bi bi-person-circle"></i>
+          <i className="bi bi-person-circle"></i>
           <div>Your Name</div>
         </div>
       </div>
       <PanelGroup className='center-container' direction="horizontal">
-        <Panel className='side-panel' collapsible={true} collapsedSize={4} defaultSize={25} minSize={15} maxSize={35}>
+        <Panel className='side-panel' collapsible={true} collapsedSize={3} defaultSize={25} minSize={10} maxSize={35}>
           left
         </Panel>
         <PanelResizeHandle className='resize-handle' style={{width: "6px"}}/>

@@ -30,11 +30,10 @@
 
 
 
-/* TODO the text can hide the button */
 .left-infos {
   display: flex;
   align-items: center;
-  width: 30vw;
+  max-width: 30vw;
 }
 
 .left-infos > img {
@@ -48,12 +47,14 @@
   flex-direction: column;
   justify-content: center;
   margin: 20px;
+
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .left-infos > .item-infos > .title-name {
   font-size: large;
   font-weight: bold;
-  white-space: nowrap;
 }
 
 .left-infos > .item-infos > .artist-name {
@@ -61,10 +62,16 @@
   white-space: nowrap;
 }
 
+/* text overflow */
+.left-infos > .item-infos > .title-name,
+.left-infos > .item-infos > .artist-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .left-infos > .bi {
-  margin-left: auto;
-  justify-self: flex-end;
-  margin-right: 10px;
+  margin: 15px;
 }
 
 

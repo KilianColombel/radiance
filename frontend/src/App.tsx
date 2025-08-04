@@ -1,8 +1,18 @@
-import { useState } from 'react'
+import { useState, useLayoutEffect } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { customizeGlobalCursorStyles, type CustomCursorStyleConfig } from "react-resizable-panels";
 import './App.css'
 
 function App() {
+  useLayoutEffect(() => {
+     function customCursor({ isPointerDown }: CustomCursorStyleConfig) {
+       return isPointerDown ? "grabbing" : "grab";
+     }
+     customizeGlobalCursorStyles(customCursor);
+     return () => {
+       customizeGlobalCursorStyles(null);
+     };
+   }, []);
 
   return (
     <div className='app-container'>
@@ -19,14 +29,33 @@ function App() {
         </div>
       </div>
       <PanelGroup className='center-container' direction="horizontal">
-        <Panel className='side-panel' collapsible={true} collapsedSize={3} defaultSize={25} minSize={10} maxSize={35}>
-          left
+        {/* TODO this needs an absolute collapsedSize to keep consistency across screen sizes but the units="pixels" property isn't supported anymore it seems
+            should i revert to a previous version or make it myself
+         */}
+        <Panel collapsible={true} collapsedSize={4} defaultSize={20} minSize={10} maxSize={30}>
+          <div className='side-panel'>
+            <div className='library'>
+              <div className='library-entry'><h1>library</h1></div>
+              <div className="library-item"><i className="bi bi-disc-fill"></i><div className="item-name">albums</div></div>
+              <div className="library-item"><i className="bi bi-person-fill"></i><div className="item-name">artists</div></div>
+              <div className="library-item"><i className="bi bi-people-fill"></i><div className="item-name">genres</div></div>
+              <div className="library-item"><i className="bi bi-music-note"></i><div className="item-name">titles</div></div>
+            </div>
+            <div className='playlists'>
+              <div className='library-entry'><h1>playlists</h1><div className='library-separator'></div></div>
+              <div className="library-item"><i className="bi bi-music-note-list"></i><div className="item-name">playlist 1</div></div>
+              <div className="library-item"><i className="bi bi-music-note-list"></i><div className="item-name">playlist 2</div></div>
+              <div className="library-item"><i className="bi bi-music-note-list"></i><div className="item-name">playlist 3</div></div>
+              <div className="library-item"><i className="bi bi-music-note-list"></i><div className="item-name">playlist 4</div></div>
+            </div>
+          </div>
         </Panel>
-        <PanelResizeHandle className='resize-handle' style={{width: "6px"}}/>
-        <Panel className="main-container" defaultSize={75} minSize={65}>
+        <PanelResizeHandle className='resize-handle'/>
+        <Panel className="main-container">
           middle
         </Panel>
       </PanelGroup>
+          
       <div className='bottom-player'>
         <audio src=""></audio>
         <div className='left-infos'>

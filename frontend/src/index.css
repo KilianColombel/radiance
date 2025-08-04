@@ -6,7 +6,12 @@
 
   --background-color: rgb(122, 122, 122);
   --text-color: white;
+  --active-element: dodgerblue;
+
   --font: medium monospace;
+
+  --outline-color: black;
+  --outlines: 1px solid var(--outline-color);
 }
 
 html, body {
@@ -20,6 +25,3 @@ html, body {
   font: var(--font);
 }
 
-* {
-  outline: auto;
-}

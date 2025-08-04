@@ -22,7 +22,7 @@ function App() {
 
   const [searchText, setSearchText] = useState<string>('');
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
   };
 
@@ -33,7 +33,7 @@ function App() {
         {/* TODO this needs an absolute collapsedSize to keep consistency across screen sizes but the units="pixels" property isn't supported anymore it seems
             should i revert to a previous version or make it myself
          */}
-        <Panel collapsible={true} collapsedSize={2.5} defaultSize={20} minSize={10} maxSize={30}>
+        <Panel collapsible={true} collapsedSize={4} defaultSize={20} minSize={10} maxSize={30}>
           <SidePanel></SidePanel>
         </Panel>
         <PanelResizeHandle className='resize-handle'/>

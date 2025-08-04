@@ -26,6 +26,7 @@ To run or build this project, you will need:
 ## External packages
 
 [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels)
+[rc-slider](https://github.com/schrodinger/rc-slider)
 
 ## How to build the frontend
 

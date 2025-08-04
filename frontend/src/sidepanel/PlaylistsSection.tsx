@@ -11,8 +11,8 @@ function PlaylistsSection() {
   return (
     <div className='playlists'>
       <div className='library-entry'>
+        <i className="bi bi-collection-play"></i>
         <h1>playlists</h1>
-        <div className='library-separator'></div>
       </div>
       {playlists.map((playlist, index) => (
         <LibraryItem key={index} icon={playlist.icon} name={playlist.name} />

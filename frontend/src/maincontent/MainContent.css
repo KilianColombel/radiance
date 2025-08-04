@@ -7,6 +7,8 @@
   grid-template-columns: 25px 1fr 1fr 1fr 40px;
   align-items: center;
   border-bottom: var(--outlines);
+
+  user-select: none;
 }
 
 .track-container > .track-title,
@@ -43,15 +45,22 @@
 
 .sort-container [class*="chevron"] {
   margin-right: 5px;
-  display: none;
 }
 
 .sort-container > .sort-duration {
+  display: flex;
   justify-self: right;
   padding-right: 2px;
 }
 
-/* for demonstratoin purpose */
-.sort-container > .sort-title .bi-chevron-down {
-  display: inline;
+.sort-container > .sort-title,
+.sort-container > .sort-artist,
+.sort-container > .sort-album,
+.sort-container > .sort-duration {
+  cursor: pointer;
+}
+
+.sorted {
+  color: var(--active-element);
+  font-weight: bold;
 }

@@ -3,11 +3,16 @@
     justify-self: center;
     align-self: center;
     animation: un-favorite 0.3s ease;
+    transition: 0.2s ease transform;
+}
+
+.favorite-icon:hover {
+    transform: scale(1.1);
 }
 
 .favorited {
     color: var(--active-element);
-    animation: favorite 0.5s ease;
+    animation: favorite 0.4s ease;
 }
 
 .favorite-icon:active {
@@ -18,11 +23,12 @@
     from {
         transform: scale(0.5);
     }
-    70% {
+    65% {
+        color: var(--important);
         transform: scale(1.2);
-        color: var(--lighter-active-element);
     }
     to {
+        color: var(--active-element);
         transform: scale(1);
     }
 }

@@ -1,5 +1,7 @@
 import FavoriteIcon from '../misc/FavoriteIcon.tsx';
 
+
+// TODO probably should put this in a types.ts file
 export interface Track {
   id: number;
   title: string;

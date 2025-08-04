@@ -7,6 +7,7 @@
 /* TODO maybe add a custom scroll bar or something */
 /* the standard scroll bar on chrom is ugly and interferes with the panel handle */
 .side-panel {
+  container-type: inline-size;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -14,23 +15,35 @@
   display: none;
 }
 
+.side-panel .library-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-panel .library-entry > .bi {
+  font-size: x-large;
+}
+
 .side-panel > .library, 
 .side-panel > .playlists {
   overflow: hidden;
   white-space: nowrap;
-  container-type: inline-size;
 }
 /* collapsed panel properties */
 @container (max-width : 4vw) {
   h1 {
     display: none;
   }
-  .library-item {
+  .library{
+    padding-bottom: 10px;
+    border-bottom: var(--outlines);
+    margin-top: 10px;
+    margin-bottom: 15px;
+  }
+  .library-item, .library-entry {
     display: flex;
     justify-content: center;
-  }
-  .library-entry > h1 {
-    display: none;
   }
   .library-entry > .library-separator {
     background-color: var(--outline-color);
@@ -38,6 +51,9 @@
     height: 1px;
     margin-bottom: 10px;
     display: block;
+  }
+  .library-entry > .bi {
+    margin-bottom: 20px;
   }
   .library-item > .bi {
     font-size: x-large;

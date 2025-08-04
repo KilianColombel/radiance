@@ -13,7 +13,7 @@ function Player() {
     isFavorite: false,
   });
 
-  const handleToggleFavorite = () => {
+  function handleToggleFavorite() {
     setCurrentTrack(prevTrack => ({
       ...prevTrack,
       isFavorite: !prevTrack.isFavorite

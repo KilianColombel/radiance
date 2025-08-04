@@ -10,7 +10,7 @@ const libraryItems = [
 function LibrarySection() {
   return (
     <div className='library'>
-      <div className='library-entry'><h1>library</h1></div>
+      <div className='library-entry'><i className="bi bi-collection"></i><h1>library</h1></div>
       {libraryItems.map((item, index) => (
         <LibraryItem key={index} icon={item.icon} name={item.name} />
       ))}

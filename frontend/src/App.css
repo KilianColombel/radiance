@@ -33,6 +33,7 @@
 
 /* TODO move in another css file/create new component */
 .bottom-player {
+  z-index: 1;
   position: relative;
   display: grid;
   grid-template-columns: 3fr 4fr 3fr;
@@ -126,6 +127,7 @@
 
 /* TODO create a new file for this too */
 .header-bar {
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
@@ -213,4 +215,42 @@
   display: flex;
   gap: 10px;
   padding: 2px;
+}
+
+
+
+/* move this to another file */
+.track-container {
+  padding: 7px;
+  display: grid;
+  grid-template-columns: 25px 1fr 1fr 1fr 40px;
+  align-items: center;
+  border-bottom: var(--outlines);
+}
+
+.track-container > .track-title,
+.track-container > .track-artist,
+.track-container > .track-album
+{
+  padding-right: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-container > .track-duration {
+  justify-self: right;
+}
+
+.sort-container {
+  background-color: var(--darker-background-color);
+}
+
+/* for demonstratoin purpose */
+.sort-container .bi {
+  margin-right: 5px;
+  display: none;
+}
+.sort-container > .sort-title .bi-chevron-down {
+  display: inline;
 }

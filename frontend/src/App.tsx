@@ -57,20 +57,20 @@ function App() {
             <div className='sort-title'><i className="bi bi-chevron-down"></i><i className="bi bi-chevron-up"></i>title</div>
             <div className="sort-artist"><i className="bi bi-chevron-down"></i><i className="bi bi-chevron-up"></i>artist</div>
             <div className="sort-album"><i className="bi bi-chevron-down"></i><i className="bi bi-chevron-up"></i>album</div>
-            <div className="sort-duration"><i className="bi bi-chevron-down"></i><i className="bi bi-chevron-up"></i>duration</div>
+            <div className="sort-duration"><i className="bi bi-chevron-down"></i><i className="bi bi-chevron-up"></i><i className="bi bi-clock"></i></div>
           </div>
           <div className='track-container'>
             <div className='favorite-button'><i className="bi bi-star"></i></div>
             <div className='track-title'>title</div>
             <div className='track-artist'>artist</div>
-            <div className='track-album'>albumalbumalbumalbumalbumalbumalbumalbumalbumalbumalbumalbumalbum</div>
+            <div className='track-album'>album</div>
             <div className='track-duration'>6:66</div>
           </div>
           <div className='track-container'>
             <div className='favorite-button'><i className="bi bi-star"></i></div>
-            <div className='track-title'>titletitletitletitletitletitletitletitletitletitletitletitletitletitletitle</div>
+            <div className='track-title'>title</div>
             <div className='track-artist'>artist</div>
-            <div className='track-album'>albumalbumalbumalbumalbumalbumalbumalbumalbumalbumalbumalbumalbum</div>
+            <div className='track-album'>albuma</div>
             <div className='track-duration'>666:66</div>
           </div>
           <div className='track-container'>

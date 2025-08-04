@@ -107,10 +107,14 @@
 
 .middle-controls > .progress-slider {
   display: flex;
+  align-items: center;
 }
 
 .middle-controls > .progress-slider > input {
   width: 100%;
+  margin: 0;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 
@@ -221,11 +225,14 @@
 
 /* move this to another file */
 .track-container {
-  padding: 7px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  margin-left: 7px;
+  margin-right: 7px;
   display: grid;
   grid-template-columns: 25px 1fr 1fr 1fr 40px;
   align-items: center;
-  border-bottom: var(--outlines);
+  border-bottom: var(--lighter-outlines);
 }
 
 .track-container > .track-title,
@@ -240,17 +247,27 @@
 
 .track-container > .track-duration {
   justify-self: right;
+  text-align: left;
 }
 
 .sort-container {
+  padding: 7px;
+  margin: 0;
+  grid-template-columns: 25px 1fr 1fr 1fr 40px;
   background-color: var(--darker-background-color);
 }
 
-/* for demonstratoin purpose */
-.sort-container .bi {
+.sort-container [class*="chevron"] {
   margin-right: 5px;
   display: none;
 }
+
+.sort-container > .sort-duration {
+  justify-self: right;
+  padding-right: 2px;
+}
+
+/* for demonstratoin purpose */
 .sort-container > .sort-title .bi-chevron-down {
   display: inline;
 }

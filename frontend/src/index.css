@@ -12,7 +12,9 @@
   --font: medium monospace;
 
   --outline-color: black;
+  --lighter-outline-color: rgb(76, 76, 76);
   --outlines: 1px solid var(--outline-color);
+  --lighter-outlines: 1px solid var(--lighter-outline-color);
 }
 
 html, body {

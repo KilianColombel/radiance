@@ -1,0 +1,56 @@
+.side-panel {
+  padding: 10px;
+  height: calc(100% - 2*10px);
+  overflow-x: hidden;
+}
+
+/* TODO maybe add a custom scroll bar or something */
+/* the standard scroll bar on chrom is ugly and interferes with the panel handle */
+.side-panel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.side-panel::-webkit-scrollbar {
+  display: none;
+}
+
+.side-panel > .library, 
+.side-panel > .playlists {
+  overflow: hidden;
+  white-space: nowrap;
+  container-type: inline-size;
+}
+/* collapsed panel properties */
+@container (max-width : 4vw) {
+  h1 {
+    display: none;
+  }
+  .library-item {
+    display: flex;
+    justify-content: center;
+  }
+  .library-entry > h1 {
+    display: none;
+  }
+  .library-entry > .library-separator {
+    background-color: var(--outline-color);
+    margin-top: 10px;
+    height: 1px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .library-item > .bi {
+    font-size: x-large;
+  }
+  .library-item > .item-name {
+    display: none;
+  }
+}
+
+.side-panel .library-item {
+  width: 100%;
+  font-size: large;
+  display: flex;
+  gap: 10px;
+  padding: 2px;
+}

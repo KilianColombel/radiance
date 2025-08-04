@@ -21,12 +21,16 @@
   width: 1px;
   background-color: var(--outline-color);
   transform: translateX(-50%);
-  transition: 0.05s ease 0.05s width;
+  transition: 0.1s ease width, 0.2s ease background-color;
 }
 
-.resize-handle[data-resize-handle-active] {
-  width: 4px;
+.resize-handle[data-resize-handle-state="hover"] {
+  width: 3px;
   background-color: var(--active-element);
+}
+.resize-handle[data-resize-handle-active] {
+  width: 3px;
+  background-color: var(--lighter-active-element);
 }
 
 
@@ -149,6 +153,24 @@
   gap: 5px;
 }
 
+.header-bar > .search-bar {
+  width: min(400px, 100%);
+  justify-self: center;
+  border: var(--lighter-outlines);
+  color: var(--text-color);
+  box-shadow: 0px 0px 0px var(--text-color);
+  background-color: var(--lighter-background-color);
+  padding: 5px;
+  border-radius: 5px;
+  transition: 0.2s ease box-shadow, 0.2s ease border;
+}
+
+.header-bar > .search-bar:focus {
+  outline: none;
+  border: var(--active-outline);
+  box-shadow: 0px 0px 3px var(--lighter-active-element);
+}
+
 .user-account {
   margin-right: 10px;
 
@@ -232,7 +254,7 @@
   display: grid;
   grid-template-columns: 25px 1fr 1fr 1fr 40px;
   align-items: center;
-  border-bottom: var(--lighter-outlines);
+  border-bottom: var(--outlines);
 }
 
 .track-container > .track-title,

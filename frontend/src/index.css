@@ -4,17 +4,20 @@
   --player-height: 100px;
   --header-height: 50px;
 
-  --background-color: rgb(122, 122, 122);
-  --darker-background-color: rgb(105, 105, 105);
-  --text-color: white;
+  --text-color: #c4b8c5;
+  --background-color: #25252c;
+  --lighter-background-color: #33343b;
+  --darker-background-color: #202027;
   --active-element: dodgerblue;
+  --lighter-active-element: #5bdeff;
 
   --font: medium monospace;
 
-  --outline-color: black;
-  --lighter-outline-color: rgb(76, 76, 76);
+  --outline-color: #1b1b20;
+  --lighter-outline-color: #908591;
   --outlines: 1px solid var(--outline-color);
-  --lighter-outlines: 1px solid var(--lighter-outline-color);
+  --lighter-outlines: 2px solid var(--lighter-outline-color);
+  --active-outline: 2px solid var(--lighter-active-element);
 }
 
 html, body {

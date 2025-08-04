@@ -32,7 +32,7 @@ function App() {
         {/* TODO this needs an absolute collapsedSize to keep consistency across screen sizes but the units="pixels" property isn't supported anymore it seems
             should i revert to a previous version or make it myself
          */}
-        <Panel collapsible={true} collapsedSize={4} defaultSize={20} minSize={10} maxSize={30}>
+        <Panel collapsible={true} collapsedSize={2.5} defaultSize={20} minSize={10} maxSize={30}>
           <div className='side-panel'>
             <div className='library'>
               <div className='library-entry'><h1>library</h1></div>

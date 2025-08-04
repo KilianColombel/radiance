@@ -1,3 +1,5 @@
+import FavoriteIcon from '../misc/FavoriteIcon.tsx';
+
 interface TrackInfosProps {
   track: {
     title: string;
@@ -5,11 +7,10 @@ interface TrackInfosProps {
     artworkUrl: string;
     isFavorite: boolean;
   };
+  onToggleFavorite: () => void;
 }
 
-function TrackInfos({ track }: TrackInfosProps) {
-  const favoriteIconClass = track.isFavorite ? 'bi-star-fill' : 'bi-star';
-  
+function TrackInfos({ track, onToggleFavorite } : TrackInfosProps) {
   return (
     <div className='left-infos'>
       <img src={track.artworkUrl} alt={track.title} />
@@ -17,7 +18,10 @@ function TrackInfos({ track }: TrackInfosProps) {
         <div className='title-name'>{track.title}</div>
         <div className='artist-name'>{track.artist}</div>
       </div>
-      <i className={`bi ${favoriteIconClass}`}></i>
+      <FavoriteIcon 
+        isFavorite={track.isFavorite} 
+        onToggleFavorite={onToggleFavorite} 
+      />
     </div>
   );
 };

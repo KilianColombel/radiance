@@ -1,0 +1,53 @@
+.favorite-icon {
+    cursor: pointer;
+    justify-self: center;
+    align-self: center;
+    animation: un-favorite 0.3s ease;
+}
+
+.favorited {
+    color: var(--active-element);
+    animation: favorite 0.5s ease;
+}
+
+.favorite-icon:active {
+    color: var(--lighter-active-element)
+}
+
+@keyframes favorite {
+    from {
+        transform: scale(0.5);
+    }
+    70% {
+        transform: scale(1.2);
+        color: var(--lighter-active-element);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes un-favorite {
+    from {
+        transform: scale(1);
+        color: var(--lighter-active-element);
+
+    }
+    
+    25% {
+        transform: scale(0.8) rotateZ(20deg);
+    }
+
+    50% {
+        transform: scale(0.8) rotateZ(-20deg);
+    }
+
+    75% {
+        transform: scale(0.8) rotateZ(10deg);
+        color: var(--lighter-active-element);
+    }
+    
+    to {
+        transform: scale(1);
+    }
+}

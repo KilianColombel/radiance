@@ -1,3 +1,5 @@
+import FavoriteIcon from '../misc/FavoriteIcon.tsx';
+
 export interface Track {
   id: number;
   title: string;
@@ -8,15 +10,21 @@ export interface Track {
 }
 
 interface TrackRowProps {
-    track: Track
+    track: Track;
+    onToggleFavorite: (trackId: number) => void;
 }
 
-export function TrackRow({track}: TrackRowProps) {
-  const favoriteIconClass = track.isFavorite ? 'bi-star-fill' : 'bi-star';
+export function TrackRow({track, onToggleFavorite}: TrackRowProps) {
+  const handleToggle = () => {
+    onToggleFavorite(track.id);
+  };
   
   return (
     <div className='track-container'>
-      <div className='favorite-button'><i className={`bi ${favoriteIconClass}`}></i></div>
+      <FavoriteIcon
+        isFavorite={track.isFavorite}
+        onToggleFavorite={handleToggle}
+      />
       <div className='track-title'>{track.title}</div>
       <div className='track-artist'>{track.artist}</div>
       <div className='track-album'>{track.album}</div>

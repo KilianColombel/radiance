@@ -13,6 +13,7 @@
 .track-container > .track-artist,
 .track-container > .track-album
 {
+  padding-left: 5px;
   padding-right: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -24,11 +25,20 @@
   text-align: left;
 }
 
+.favorite-button {
+  width: 30px;
+  height: 30px;
+}
+
 .sort-container {
   padding: 7px;
   margin: 0;
   grid-template-columns: 25px 1fr 1fr 1fr 40px;
   background-color: var(--darker-background-color);
+}
+
+.sort-container > div {
+  padding-left: 5px;
 }
 
 .sort-container [class*="chevron"] {

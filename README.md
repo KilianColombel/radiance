@@ -14,8 +14,8 @@ This application aims to provide a lightweight and responsive music streaming se
 
 To run or build this project, you will need:
 
-- **Node.js** `>= 18.x`
-- **npm** `>= 9.x` or `pnpm` / `yarn` as alternatives
+- **Node.js** : use lts
+- **npm** or `pnpm` / `yarn` as alternatives
 - A web interface
 - A backend music streaming API or local JSON dataset
 

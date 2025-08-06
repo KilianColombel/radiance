@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
+
+import './MainContent.css';
 import TrackHeader from './TrackHeader.tsx';
 import { type Track, TrackRow } from './TrackRow.tsx';
-import './MainContent.css';
+import { stringToSeconds } from '../misc/handleTime.ts';
 
 const initialTracks: Track[] = [
   { id: 1, title: 'Island In The Sun', artist: 'Weezer', album: 'Weezer', duration: '3:20', isFavorite: false },
@@ -36,13 +38,8 @@ function MainContent() {
         
         // TODO figure this out...
         // extra step for duration : i don't know what format the duration will have so this is what i'll use for now
-        // i made a similar function for the progress slider
         if (sortConfig.key === 'duration') {
-          const toSeconds = (time: string) => {
-            const [minutes, seconds] = time.split(':').map(Number);
-            return minutes * 60 + seconds;
-          };
-          comparison = toSeconds(aValue) - toSeconds(bValue);
+          comparison = stringToSeconds(aValue) - stringToSeconds(bValue);
         } 
         
         else {

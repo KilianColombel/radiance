@@ -1,8 +1,10 @@
 import { useState } from 'react';
+
+import './Player.css';
 import TrackInfos from './TrackInfos.tsx';
 import PlayerControls from './PlayerControls.tsx';
 import PlayerVolume from './PlayerVolume.tsx';
-import './Player.css';
+import { stringToSeconds } from '../misc/handleTime.ts';
 
 function Player() {
   const [currentTrack, setCurrentTrack] = useState({
@@ -24,7 +26,7 @@ function Player() {
     <div className='bottom-player'>
       <audio src=""></audio>
       <TrackInfos track={currentTrack} onToggleFavorite={handleToggleFavorite} />
-      <PlayerControls duration={currentTrack.duration} />
+      <PlayerControls duration={stringToSeconds(currentTrack.duration)} />
       <PlayerVolume />
     </div>
   );

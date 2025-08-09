@@ -1,17 +1,12 @@
 import { useState, useMemo } from 'react';
 
+import { type Track } from '../../../common/types.ts'
 import './MainContent.css';
 import TrackHeader from './TrackHeader.tsx';
-import { type Track, TrackRow } from './TrackRow.tsx';
+import { TrackRow } from './TrackRow.tsx';
 import { stringToSeconds } from '../misc/handleTime.ts';
+import { useEffect } from 'react';
 
-const initialTracks: Track[] = [
-  { id: 1, title: 'Island In The Sun', artist: 'Weezer', album: 'Weezer', duration: '3:20', isFavorite: false },
-  { id: 2, title: 'Stuck In The Middle With You', artist: 'Stealers Wheel', album: 'Stealers Wheel', duration: '3:29', isFavorite: true },
-  { id: 3, title: 'This Must Be the Place', artist: 'Talking Heads', album: 'Speaking in Tongues', duration: '4:56', isFavorite: false },
-  { id: 4, title: 'Cloud Nine', artist: 'George Harrison', album: 'Cloud Nine', duration: '3:17', isFavorite: false },
-  { id: 5, title: 'Lovefool', artist: 'The Cardigans', album: 'First Band On The Moon', duration: '3:14', isFavorite: false },
-];
 
 export type SortKey = keyof Omit<Track, 'id' | 'isFavorite'>; // keys to sort on
 type SortOrder = 'asc' | 'desc';
@@ -23,8 +18,18 @@ export interface SortConfig {
 
 
 function MainContent() {
-  const [tracks, setTracks] = useState<Track[]>(initialTracks);
+  const [tracks, setTracks] = useState<Track[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, order: 'asc' });
+
+  function loadTracks() {
+    fetch("http://localhost:1234/api/musiques/example-1")
+      .then(res => res.json())
+      .then(data => setTracks(data));
+  }
+
+  useEffect(() => {
+    loadTracks();
+  }, [])
 
   const sortedTracks = useMemo(() => {
     let sortableTracks = [...tracks];

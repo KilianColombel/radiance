@@ -28,17 +28,8 @@ To run or build this project, you will need:
 [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels)
 [rc-slider](https://github.com/schrodinger/rc-slider)
 
-## How to build the frontend
+## How to test it ?
 
-```bash
-cd ./frontend
-npm install
-```
-
-## How to test the interface
-
-```bash
-cd ./frontend
-npm run dev
-```
-Then go to : ```http://localhost:5173```
+Run ```npm install``` in both frontend and backend directories.
+Run ```npm run dev``` in the frontend folder.
+Run ```node ./index.js``` in the backend folder.

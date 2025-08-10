@@ -20,7 +20,7 @@ const playlist2 = [
 ]
 
 
-trackListRouter.get('/api/musiques/:id', (req, res) => {
+trackListRouter.get('/:id', (req, res) => {
   switch (req.params.id) {
     case "example-1":
       res.json(playlist1);

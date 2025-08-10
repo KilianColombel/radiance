@@ -1,6 +1,7 @@
 import { useState, useLayoutEffect } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { customizeGlobalCursorStyles, type CustomCursorStyleConfig } from "react-resizable-panels";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
 
 import Header from './header/Header.tsx';
@@ -38,7 +39,11 @@ function App() {
         </Panel>
         <PanelResizeHandle className='resize-handle'/>
         <Panel >
-          <MainContent></MainContent>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/list/:id" element={<MainContent />} />
+            </Routes>
+          </BrowserRouter>
         </Panel>
       </PanelGroup>
       <Player></Player>      

@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { type Track } from '../../../common/types.ts'
 import './MainContent.css';
 import TrackHeader from './TrackHeader.tsx';
 import { TrackRow } from './TrackRow.tsx';
 import { stringToSeconds } from '../misc/handleTime.ts';
-import { useEffect } from 'react';
 
 
 export type SortKey = keyof Omit<Track, 'id' | 'isFavorite'>; // keys to sort on
@@ -20,16 +20,19 @@ export interface SortConfig {
 function MainContent() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, order: 'asc' });
+  const { id } = useParams();
 
-  function loadTracks() {
-    fetch("http://localhost:1234/api/musiques/example-1")
+  function loadTracks(listID: string) {
+    fetch(`http://localhost:1234/api/playlist/${listID}`)
       .then(res => res.json())
       .then(data => setTracks(data));
   }
 
   useEffect(() => {
-    loadTracks();
-  }, [])
+    if (id) {
+      loadTracks(id);
+    }
+  }, [id])
 
   const sortedTracks = useMemo(() => {
     let sortableTracks = [...tracks];
@@ -40,13 +43,9 @@ function MainContent() {
         const bValue = b[sortConfig.key!];
 
         let comparison = 0;
-        
-        // TODO figure this out...
-        // extra step for duration : i don't know what format the duration will have so this is what i'll use for now
         if (sortConfig.key === 'duration') {
           comparison = stringToSeconds(aValue) - stringToSeconds(bValue);
-        } 
-        
+        }
         else {
           comparison = aValue.localeCompare(bValue);
         }

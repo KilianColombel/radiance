@@ -7,7 +7,7 @@ app.use(express.json());
 
 // api 
 const trackListRouter = require("./routes/trackList")
-app.use("/", trackListRouter);
+app.use("/api/playlist", trackListRouter);
 
 
 const PORT = 1234;

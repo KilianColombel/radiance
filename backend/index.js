@@ -1,16 +1,19 @@
 const express = require('express');
 const cors = require('cors');
 
+require('dotenv').config();
+const port = process.env.PORT;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 // api 
-const trackListRouter = require("./routes/trackList")
+const trackListRouter = require("./routes/trackList");
 app.use("/api/playlist", trackListRouter);
+const audioFilesRouter = require("./routes/audioFiles");
+app.use("/api/audio", audioFilesRouter);
 
-
-const PORT = 1234;
-app.listen(PORT, () => {
-  console.log(`server started at : http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`server started at : http://localhost:${port}`);
 });

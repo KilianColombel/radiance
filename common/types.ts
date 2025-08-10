@@ -5,4 +5,6 @@ export interface Track {
   album: string;
   duration: string;
   isFavorite: boolean;
+
+  audioSrc: string;
 }

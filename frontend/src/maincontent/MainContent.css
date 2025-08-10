@@ -1,19 +1,26 @@
 .track-container {
-  padding-top: 7px;
-  padding-bottom: 7px;
+
   margin-left: 7px;
   margin-right: 7px;
   display: grid;
-  grid-template-columns: 25px 1fr 1fr 1fr 40px;
+  grid-template-columns: 25px 1fr;
   align-items: center;
   border-bottom: var(--outlines);
 
   user-select: none;
 }
 
-.track-container > .track-title,
-.track-container > .track-artist,
-.track-container > .track-album
+.track-container > .play-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 40px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  cursor: pointer;
+}
+
+.track-container > .play-container > .track-title,
+.track-container > .play-container > .track-artist,
+.track-container > .play-container > .track-album
 {
   padding-left: 5px;
   padding-right: 5px;
@@ -22,7 +29,7 @@
   text-overflow: ellipsis;
 }
 
-.track-container > .track-duration {
+.track-container > .play-container > .track-duration {
   justify-self: right;
   text-align: left;
 }

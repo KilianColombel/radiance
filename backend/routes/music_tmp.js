@@ -1,11 +1,13 @@
 const musicPath = "../../music";
 
-const playlist1 = [
+// TODO the songs need a global id so they can be called from the same api call no matter where they're played from (playlist, album, etc...)
+
+export const playlist1 = [
   { id: 1, title: 'Island In The Sun', artist: 'Weezer', album: 'Weezer', duration: '3:20', isFavorite: false, audioSrc: `${musicPath}/Island In The Sun.mp3` },
-  { id: 2, title: 'Stuck In The Middle With You', artist: 'Stealers Wheel', album: 'Stealers Wheel', duration: '3:29', isFavorite: true, audioSrc: `${musicPath}/Stuck In The Middle With You*` },
-  { id: 3, title: 'This Must Be the Place', artist: 'Talking Heads', album: 'Speaking in Tongues', duration: '4:56', isFavorite: false, audioSrc: `${musicPath}/This Must Be the Place*` },
-  { id: 4, title: 'Cloud Nine', artist: 'George Harrison', album: 'Cloud Nine', duration: '3:17', isFavorite: false, audioSrc: `${musicPath}/Cloud Nine*` },
-  { id: 5, title: 'Lovefool', artist: 'The Cardigans', album: 'First Band On The Moon', duration: '3:14', isFavorite: false, audioSrc: `${musicPath}/Lovefool*` },
+  { id: 2, title: 'Stuck In The Middle With You', artist: 'Stealers Wheel', album: 'Stealers Wheel', duration: '3:29', isFavorite: true, audioSrc: `${musicPath}/Stuck In The Middle With You.flac` },
+  { id: 3, title: 'This Must Be the Place', artist: 'Talking Heads', album: 'Speaking in Tongues', duration: '4:56', isFavorite: false, audioSrc: `${musicPath}/This Must Be the Place (Naive Melody).flac` },
+  { id: 4, title: 'Cloud Nine', artist: 'George Harrison', album: 'Cloud Nine', duration: '3:17', isFavorite: false, audioSrc: `${musicPath}/Cloud Nine.mp3` },
+  { id: 5, title: 'Lovefool', artist: 'The Cardigans', album: 'First Band On The Moon', duration: '3:14', isFavorite: false, audioSrc: `${musicPath}/Lovefool.flac` },
 ];
 
 const playlist2 = [
@@ -15,8 +17,3 @@ const playlist2 = [
   { id: 4, title: 'Dam That River', artist: 'Alice In Chains', album: 'Dirt', duration: '3:09', isFavorite: false },
   { id: 5, title: 'Body Behavior', artist: 'Deafheaven', album: 'Lonely People With Power', duration: '5:23', isFavorite: false },
 ];
-
-module.exports = {
-    playlist1, 
-    playlist2
-}

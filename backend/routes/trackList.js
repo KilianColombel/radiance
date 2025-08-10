@@ -1,4 +1,4 @@
-const { Router } = require("express");
+import { Router } from "express";
 const trackListRouter = Router();
 
 
@@ -39,4 +39,4 @@ trackListRouter.get('/:id', (req, res) => {
   }
 })
 
-module.exports = trackListRouter;
+export default trackListRouter;

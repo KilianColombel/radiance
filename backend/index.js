@@ -1,17 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-
-require('dotenv').config();
-const port = process.env.PORT;
+import express from 'express';
+import cors from 'cors';
 
 const app = express();
+
+const port = 1234;
+// TODO maybe restrict the allowed domains or something...
 app.use(cors());
 app.use(express.json());
 
 // api 
-const trackListRouter = require("./routes/trackList");
+import trackListRouter from "./routes/trackList.js";
 app.use("/api/playlist", trackListRouter);
-const audioFilesRouter = require("./routes/audioFiles");
+import audioFilesRouter from "./routes/audioFiles.js";
 app.use("/api/audio", audioFilesRouter);
 
 app.listen(port, () => {

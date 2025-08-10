@@ -1,29 +1,33 @@
-const path = require('path');
-const { Router } = require("express");
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Router } from "express";
+
+import { playlist1 } from './music_tmp.js'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const audioFilesRouter = Router();
 
-const musicPath = "../../music";
-
-const playlist1 = [
-  { id: 1, title: 'Island In The Sun', artist: 'Weezer', album: 'Weezer', duration: '3:20', isFavorite: false, audioSrc: `${musicPath}/Island in the Sun.mp3` },
-  { id: 2, title: 'Stuck In The Middle With You', artist: 'Stealers Wheel', album: 'Stealers Wheel', duration: '3:29', isFavorite: true, audioSrc: `${musicPath}/Stuck In The Middle With You.flac` },
-  { id: 3, title: 'This Must Be the Place', artist: 'Talking Heads', album: 'Speaking in Tongues', duration: '4:56', isFavorite: false, audioSrc: `${musicPath}/This Must Be the Place (Naive Melody).flac` },
-  { id: 4, title: 'Cloud Nine', artist: 'George Harrison', album: 'Cloud Nine', duration: '3:17', isFavorite: false, audioSrc: `${musicPath}/Cloud Nine.mp3` },
-  { id: 5, title: 'Lovefool', artist: 'The Cardigans', album: 'First Band On The Moon', duration: '3:14', isFavorite: false, audioSrc: `${musicPath}/Lovefool.flac` },
-];
 
 audioFilesRouter.get('/:id', (req, res) => {
-    const songSrc = playlist1.find(song => song.id == req.params.id).audioSrc;
+    const song = playlist1.find(song => song.id == req.params.id);
 
-    const filePath = path.join(__dirname, '../audio', songSrc);
+    if (!song) {
+        return res.status(404).send('song not found');
+    }
+
+    // TODO the user should be able to choose where the songs are stored on his machine
+    const filePath = path.join(__dirname, '../audio', song.audioSrc);
     console.log(filePath)
 
-    res.sendFile(filePath, (err) => {
+    fs.access(filePath, fs.constants.F_OK, (err) => {
         if (err) {
-            console.log(err);
-            res.status(404).send("file not found")
+            console.error(`Fichier non trouvé : ${filePath}`);
+            return res.status(404).send('Fichier audio non trouvé sur le serveur.');
         }
-    })
+        res.sendFile(filePath);
+    });
 })
 
-module.exports = audioFilesRouter;
+export default audioFilesRouter;

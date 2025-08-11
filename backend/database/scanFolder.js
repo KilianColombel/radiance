@@ -3,6 +3,9 @@ import path from 'path';
 import { parseFile } from 'music-metadata';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import fetch from "node-fetch";
+
+// TODO this file is digusting but i don't know how to split it in multiple files. i don't know what the cost of opening the database is.
 
 const musicDirectory = '../../../music'; 
 // the music directory should look like this :
@@ -12,13 +15,14 @@ const musicDirectory = '../../../music';
 //       L song1.*
 //       L song2.*
 //       ...
+// this eliminates a lot of headaches when the files don't have the right metadata
 
 // database creation
 async function createDB() {
     const filePath = "./radiance.db";
     try {
         if (fs.existsSync(filePath)) {
-            console.log("database already exists, skipping creation")
+            console.log("database already exists, skipping file creation")
         }
         else {
             await fs.promises.writeFile(filePath, "", "utf8")
@@ -64,6 +68,7 @@ async function setupDb() {
             duration INTEGER NOT NULL,
             track_artist TEXT,
             track_album TEXT,
+            disk_number INTEGER,
             UNIQUE(name, track_artist, track_album)
         );`
     );
@@ -75,10 +80,23 @@ async function setupDb() {
             name TEXT NOT NULL,
             favorited BOOLEAN NOT NULL,
             born TEXT,
-            founded INTEGER,
             country TEXT,
             wiki TEXT,
             UNIQUE(name)
+        );`
+    )
+
+    // aliases table for better search (ex "Parannoul" == "파란노을" == "Huremic" == "Mydreamfever" == "lastar" == "끝이별" ...)
+    // TODO maybe should do the same for albums if it's available on musicbrainz
+    await db.exec(
+       `CREATE TABLE IF NOT EXISTS aliases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            
+            artist_name TEXT,
+            FOREIGN KEY (artist_name) REFERENCES artist(name)
+
+            UNIQUE(name, artist_name)
         );`
     )
 
@@ -91,6 +109,7 @@ async function setupDb() {
             year INTEGER,
             wiki TEXT,
             length INTEGER,
+            disk_count INTEGER,
             UNIQUE(name)
         );`
     )
@@ -193,40 +212,40 @@ async function setupDb() {
 setupDb();
 
 // TABLES
-async function addTrack(name, duration, track_artist, track_album) {
+async function addTrack(name, duration, track_artist, track_album, disk_number) {
   try {
-    const result = await db.run(
-      `INSERT OR IGNORE INTO tracks (name, favorited, duration, track_artist, track_album) 
-       VALUES (?, ?, ?, ?, ?);`,
-      [name, false, duration, track_artist, track_album]
+    await db.run(
+      `INSERT OR IGNORE INTO tracks (name, favorited, duration, track_artist, track_album, disk_number) 
+       VALUES (?, ?, ?, ?, ?, ?);`,
+      [name, false, duration, track_artist, track_album, disk_number]
     );
-    console.log(`track "${name}" added with id : ${result.lastID}`);
+    // console.log(`track "${name}" added with`);
   } catch (error) {
     console.error(`couldn't add track "${name}" :`, error);
   } 
 }
 
-async function addArtist(name, born, founded, country, wiki) {
+async function addArtist(name, born, country, wiki) {
   try {
-    const result = await db.run(
-      `INSERT OR IGNORE INTO artists (name, favorited, born, founded, country, wiki) 
-       VALUES (?, ?, ?, ?, ? , ?);`,
-      [name, false, born, founded, country, wiki]
+    await db.run(
+      `INSERT OR IGNORE INTO artists (name, favorited, born, country, wiki) 
+       VALUES (?, ?, ?, ?, ?);`,
+      [name, false, born, country, wiki]
     );
-    console.log(`artist "${name}" added with id : ${result.lastID}`);
+    // console.log(`artist "${name}" added`);
   } catch (error) {
     console.error(`couldn't add artist "${name}" :`, error);
   } 
 }
 
-async function addAlbum(name, year, wiki, length) {
+async function addAlbum(name, year, wiki, length, disk_count) {
   try {
-    const result = await db.run(
-      `INSERT OR IGNORE INTO albums (name, favorited, year, wiki, length) 
-       VALUES (?, ?, ?, ?, ?);`,
-      [name, false, year, wiki, length]
+    await db.run(
+      `INSERT OR IGNORE INTO albums (name, favorited, year, wiki, length, disk_count) 
+       VALUES (?, ?, ?, ?, ?, ?);`,
+      [name, false, year, wiki, length, disk_count]
     );
-    console.log(`album "${name}" added with id : ${result.lastID}`);
+    // console.log(`album "${name}" added`);
   } catch (error) {
     console.error(`couldn't add album "${name}" :`, error);
   } 
@@ -234,12 +253,12 @@ async function addAlbum(name, year, wiki, length) {
 
 async function addGenre(name, wiki) {
   try {
-    const result = await db.run(
+    await db.run(
       `INSERT OR IGNORE INTO genres (name, wiki) 
        VALUES (?, ?);`,
       [name, wiki]
     );
-    console.log(`genre "${name}" added with id : ${result.lastID}`);
+    // console.log(`genre "${name}" added`);
   } catch (error) {
     console.error(`couldn't add track "${name}" :`, error);
   } 
@@ -257,7 +276,7 @@ async function addTrackArtist(trackName, artistName) {
       [trackName, artistName]
     );
     if (result.changes > 0) {
-        console.log(`link between ${trackName} and artist ${artistName} added`);
+        // console.log(`link between ${trackName} and artist ${artistName} added`);
     }
   } catch (error) {
     console.error(`couldn't add link between ${trackName} and artist with id ${artistName} :`, error);
@@ -275,7 +294,7 @@ async function addTrackAlbum(trackName, albumName) {
       [trackName, albumName]
     );
     if (result.changes > 0) {
-        console.log(`link between ${trackName} and album ${albumName} added`);
+        // console.log(`link between ${trackName} and album ${albumName} added`);
     }
   } catch (error) {
     console.error(`couldn't add link between ${trackName} and album with id ${albumName} :`, error);
@@ -293,7 +312,7 @@ async function addArtistAlbum(artistName, albumName) {
       [artistName, albumName]
     );
     if (result.changes > 0) {
-        console.log(`link between ${artistName} and album ${albumName} added`);
+        // console.log(`link between ${artistName} and album ${albumName} added`);
     }
   } catch (error) {
     console.error(`couldn't add link between ${artistName} and album with id ${albumName} :`, error);
@@ -311,7 +330,7 @@ async function addTrackGenre(trackName, genreName) {
       [trackName, genreName]
     );
     if (result.changes > 0) {
-        console.log(`link between ${trackName} and genre ${genreName} added`);
+        // console.log(`link between ${trackName} and genre ${genreName} added`);
     }
   } catch (error) {
     console.error(`couldn't add link between ${trackName} and genre with id ${genreName} :`, error);
@@ -329,7 +348,7 @@ async function addArtistGenre(artistName, genreName) {
       [artistName, genreName]
     );
     if (result.changes > 0) {
-        console.log(`link between ${artistName} and genre ${genreName} added`);
+        // console.log(`link between ${artistName} and genre ${genreName} added`);
     }
   } catch (error) {
     console.error(`couldn't add link between ${artistName} and genre with id ${genreName} :`, error);
@@ -347,13 +366,28 @@ async function addAlbumGenre(albumName, genreName) {
       [albumName, genreName]
     );
     if (result.changes > 0) {
-        console.log(`link between ${albumName} and genre ${genreName} added`);
+        // console.log(`link between ${albumName} and genre ${genreName} added`);
     }
   } catch (error) {
     console.error(`couldn't add link between ${albumName} and genre with id ${genreName} :`, error);
   } 
 }
 
+async function addAlias(alias, artistName) {
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO aliases (name, artist_name) 
+       VALUES (?, ?);`,
+      [alias, artistName]
+    );
+    // console.log(`alias ${alias} added for artist with id : ${artistName}`)
+  } catch (err) {
+    console.error(`couldn't add alias ${alias} for artist with id : ${artistName}`)
+  }
+}
+
+// TODO Jest tests ?
+// TODO more tests ?
 // --- TESTS ---
 // await addTrack("aurora", 279, "björk", "vespertine")
 // await addArtist("björk", null, "1965-11-21", "iceland", "björk's wiki")
@@ -373,66 +407,96 @@ async function addAlbumGenre(albumName, genreName) {
 // await addAlbumGenre("facelift", "grunge")
 
 
-
+const extensions = ["flac", "mp3", "aiff", "aac", "ape", "asf", "bwf", "dsdiff", "dsf", "mp2", "mka", "mkv", "mpc", "mp4", "m4a", "m4v", "ogg", "webm", "wv", "wma", "wav"] // i don't know most of these...
 async function scanMusicFiles(dir) {
-    try {
-        const artists = await fs.promises.readdir(dir, { withFileTypes: true });
+  try {
+    const artists = await fs.promises.readdir(dir, { withFileTypes: true });
 
-        for (const artist of artists) {
-            if (artist.isDirectory()) {
-                try {
-                    const artistName = artist.name; // the name of the folder : chosen by the user so that it doesn't depend on the files metadata
-                    const artistPath = path.join(dir, artistName);
-                    const albums = await fs.promises.readdir(artistPath, { withFileTypes: true });
-    
-                    for (const album of albums) {
-                        if (album.isDirectory()) {
-                            try {
-                                const albumName = album.name; // same here...
-                                const albumPath = path.join(artistPath, albumName);
-                                const tracks = await fs.promises.readdir(albumPath, { withFileTypes: true });
-        
-                                for (const track of tracks) {
-                                    if (track.isFile()) {
-                                        const filePath = path.join(albumPath, track.name);
-                                        
-                                        if (["mp3", "flac"].includes(filePath.split(".").pop().toLocaleLowerCase())) { // TODO add all the extensions allowed by music-metatdata
-                                            try {
-                                                const metadata = await parseFile(filePath, { duration: true });
+    for (const artist of artists) {
+      if (artist.isDirectory()) {
+        try {
+          const artistName = artist.name;
+          const artistPath = path.join(dir, artistName);
+          const albums = await fs.promises.readdir(artistPath, { withFileTypes: true });
+
+          // TODO doesn't need to call the api if it's already in the database but sqlite3 doesn't allow async fucntion calls (aka fetch) inside db.get
+          // the idea would be to use triggers so that the database updates its infos on its own but how to do api call inside sql ???
+          // i just look at it, it's not possible => find someway else
+          const artistData = await fetchArtistData(artistName)
+
+          await addArtist(artistName, artistData["life-span"].begin, artistData.area.name, null);
+
+          for (let i = 0; i < artistData.aliases; i++) {
+            await addAlias(artistData.aliases.name, artistName);
+          }
+
+          const artistGenres = artistData.tags.sort((a,b) => b.count - a.count).slice(0, 5).map(tag => tag.name);
+          for (let i = 0; i < artistGenres.length; i++) {
+            await addGenre(artistGenres[i], null)
+            await addArtistGenre(artistName, artistGenres[i])
+          }
+          
+          for (const album of albums) {
+            if (album.isDirectory()) {
+              try {
+                const albumName = album.name;
+                const albumPath = path.join(artistPath, albumName);
+                const tracks = await fs.promises.readdir(albumPath, { withFileTypes: true });
+                let albumDuration = 0;
+                let diskCount = 1; 
+
                 
-                                                console.log('---');
-                                                console.log(`title    : ${metadata.common.title}`);
-                                                console.log(`artist   : ${metadata.common.albumartist || metadata.common.artist}`); // this is the artist name related to the metadata; no idea what to do with it. 
-                                                                                                                                    // TODO there is more to do here because of multiple artists tracks (separated by symbols like | or & ...)
-                                                console.log(`album    : ${metadata.common.album}`);  // same for the album
-                                                console.log(`duration : ${secondsToString(metadata.format.duration)}`);
+                for (const track of tracks) {
+                  if (track.isFile()) {
+                    const trackName = track.name;
+                    const filePath = path.join(albumPath, track.name);
+                    
+                    if (extensions.includes(filePath.split(".").pop().toLocaleLowerCase())) { 
+                      try {
+                        const metadata = await parseFile(filePath, { duration: true });
 
-                                                await addTrack(metadata.common.title, secondsToString(metadata.format.duration), metadata.common.albumartist || metadata.common.artist, metadata.common.album)
-                                            } catch(err) { 
-                                                console.log("couldn't read music file", err)    
-                                            }
-                                        }
-                                        else {
-                                            /* test if it's an image : then it's probably the album cover
-                                               TODO : how to add it to the front end */
-                                        }
-                                    }
-                                }
-                            } catch(err) {
-                                console.log("couldn't read album folder", err);
-                            }
-                        }
+                        albumDuration += metadata.format.duration;
+
+                        await addTrack(metadata.common.title, Number.parseInt(metadata.format.duration), metadata.common.albumartist || metadata.common.artist, metadata.common.album, metadata.common.disk.no || 1)
+                        await addTrackArtist(metadata.common.title, artistName);
+                        await addTrackAlbum(metadata.common.albumartist || metadata.common.artist);
+
+                        diskCount = Math.max(diskCount, metadata.common.disk.of);
+
+                        
+                        // TODO i want to fetch the track's tags but i don't know how :( 
+
+                      } catch(err) { 
+                          console.log("couldn't read music file", err)
+                      }
                     }
-                } catch(err) {
-                    console.log("couldn't read artist folder", err);
+                    else {
+                        /* test if it's an image : then it's probably the album cover
+                            TODO : how to add it to the front end */
+                    }
+                  }
                 }
+
+                // TODO doesn't need to call the api if it's already in the database but sqlite3 doesn't allow async fucntion calls (aka fetch) inside db.get 
+                const albumData = await fetchAlbumData(albumName ,artistName)
+                await addAlbum(albumName, albumData.date.split("-")[0], null, Number.parseInt(albumDuration), diskCount);
+                await addArtistAlbum(artistName, albumName);
+
+              } catch(err) {
+                console.log("couldn't read album folder", err);
+              }
             }
+          }
+        } catch(err) {
+            console.log("couldn't read artist folder", err);
         }
-    } catch(err) { // TODO maybe should divide this in other catches because right now, if one file fails, everything fails
-        console.error("couldn' read main folder", err);
-    } finally {
-        await db.close();
+      }
     }
+  } catch(err) {
+      console.error("couldn' read main folder", err);
+  } finally {
+      await db.close();
+  }
 }
 
 // copied from frontend...
@@ -443,3 +507,44 @@ export function secondsToString(timeInSeconds) {
 };
 
 scanMusicFiles(musicDirectory);
+
+
+
+
+async function fetchArtistData(artistName) {
+  const url = `https://musicbrainz.org/ws/2/artist/?query=${encodeURIComponent(artistName)}&limit=1&fmt=json`;
+
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "radiance-server/alpha"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error : ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return data.artists?.[0] || null;
+}
+
+async function fetchAlbumData(albumName, artistName) {
+  const url = `https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(`release:${albumName} AND artist:${artistName}`)}&limit=1&fmt=json`;
+
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "radiance-server/alpha"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  return data.releases?.[0] || null;
+}
+
+

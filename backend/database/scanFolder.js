@@ -3,7 +3,8 @@ import path from 'path';
 import { parseFile } from 'music-metadata';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import fetch from "node-fetch";
+
+import { fetchArtistData, fetchAlbumData, fetchAlbumTags, getTop5 } from './fetchData.js';
 
 // TODO this file is digusting but i don't know how to split it in multiple files. i don't know what the cost of opening the database is.
 
@@ -416,25 +417,38 @@ async function scanMusicFiles(dir) {
       if (artist.isDirectory()) {
         try {
           const artistName = artist.name;
+          let artistNameFromData = artist.name; // this is because to request the album data, it's better to use the name from musicbrainz
           const artistPath = path.join(dir, artistName);
           const albums = await fs.promises.readdir(artistPath, { withFileTypes: true });
+
+          console.log("***** ", artistName, " *****")
 
           // TODO doesn't need to call the api if it's already in the database but sqlite3 doesn't allow async fucntion calls (aka fetch) inside db.get
           // the idea would be to use triggers so that the database updates its infos on its own but how to do api call inside sql ???
           // i just look at it, it's not possible => find someway else
-          const artistData = await fetchArtistData(artistName)
+          try {
+            const artistData = await fetchArtistData(artistName)
+            artistNameFromData = artistData.name;
+            await addArtist(artistName, artistData["life-span"].begin, artistData.area.name, null);
+  
+            if(artist.aliases) {
+              for (let i = 0; i < artistData.aliases; i++) {
+                await addAlias(artistData.aliases.name, artistName);
+              }
+            }
+            const artistTags = getTop5(artistData.tags);
+            if (artistTags) {
+              for (let i = 0; i < artistTags.length; i++) {
+                await addGenre(artistTags[i], null)
+                await addArtistGenre(artistName, artistTags[i])
+              }
+            }
 
-          await addArtist(artistName, artistData["life-span"].begin, artistData.area.name, null);
-
-          for (let i = 0; i < artistData.aliases; i++) {
-            await addAlias(artistData.aliases.name, artistName);
+          } catch (err) {
+            console.error(artistName, err);
           }
 
-          const artistGenres = artistData.tags.sort((a,b) => b.count - a.count).slice(0, 5).map(tag => tag.name);
-          for (let i = 0; i < artistGenres.length; i++) {
-            await addGenre(artistGenres[i], null)
-            await addArtistGenre(artistName, artistGenres[i])
-          }
+
           
           for (const album of albums) {
             if (album.isDirectory()) {
@@ -445,6 +459,14 @@ async function scanMusicFiles(dir) {
                 let albumDuration = 0;
                 let diskCount = 1; 
 
+                console.log("      ", albumName)
+
+                const albumTags = await fetchAlbumTags(albumName, artistNameFromData).then(tags => getTop5(tags));
+                if (albumTags) {
+                  for (let i = 0; i < albumTags.length; i++) {
+                    await addGenre(albumTags[i], null);
+                  }
+                }
                 
                 for (const track of tracks) {
                   if (track.isFile()) {
@@ -463,8 +485,11 @@ async function scanMusicFiles(dir) {
 
                         diskCount = Math.max(diskCount, metadata.common.disk.of);
 
-                        
-                        // TODO i want to fetch the track's tags but i don't know how :( 
+                        if (albumTags) {
+                          for (let i = 0; i < albumTags.length; i++) {
+                            await addTrackGenre(metadata.common.title, albumTags[i])
+                          }
+                        }
 
                       } catch(err) { 
                           console.log("couldn't read music file", err)
@@ -478,10 +503,15 @@ async function scanMusicFiles(dir) {
                 }
 
                 // TODO doesn't need to call the api if it's already in the database but sqlite3 doesn't allow async fucntion calls (aka fetch) inside db.get 
-                const albumData = await fetchAlbumData(albumName ,artistName)
+                const albumData = await fetchAlbumData(albumName, artistNameFromData)
                 await addAlbum(albumName, albumData.date.split("-")[0], null, Number.parseInt(albumDuration), diskCount);
                 await addArtistAlbum(artistName, albumName);
-
+                
+                if (albumTags) {
+                  for (let i = 0; i < albumTags.length; i++) {
+                    await addAlbumGenre(albumName, albumTags[i])
+                  }
+                }
               } catch(err) {
                 console.log("couldn't read album folder", err);
               }
@@ -507,44 +537,3 @@ export function secondsToString(timeInSeconds) {
 };
 
 scanMusicFiles(musicDirectory);
-
-
-
-
-async function fetchArtistData(artistName) {
-  const url = `https://musicbrainz.org/ws/2/artist/?query=${encodeURIComponent(artistName)}&limit=1&fmt=json`;
-
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent": "radiance-server/alpha"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error : ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  return data.artists?.[0] || null;
-}
-
-async function fetchAlbumData(albumName, artistName) {
-  const url = `https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(`release:${albumName} AND artist:${artistName}`)}&limit=1&fmt=json`;
-
-  const response = await fetch(url, {
-    headers: {
-      "User-Agent": "radiance-server/alpha"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  return data.releases?.[0] || null;
-}
-
-

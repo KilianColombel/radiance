@@ -5,8 +5,8 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 import { fetchArtistData, fetchAlbumData, fetchAlbumTags, getTop5 } from './fetchData.js';
+import { fetchArtistWiki, fetchAlbumWiki, fetchGenreWiki } from './fetchData.js';
 
-// TODO this file is digusting but i don't know how to split it in multiple files. i don't know what the cost of opening the database is.
 
 const musicDirectory = '../../../music'; 
 // the music directory should look like this :
@@ -70,6 +70,7 @@ async function setupDb() {
             track_artist TEXT,
             track_album TEXT,
             disk_number INTEGER,
+            file_name TEXT,
             UNIQUE(name, track_artist, track_album)
         );`
     );
@@ -79,10 +80,12 @@ async function setupDb() {
         `CREATE TABLE IF NOT EXISTS artists (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            folder_name,
             favorited BOOLEAN NOT NULL,
             born TEXT,
             country TEXT,
             wiki TEXT,
+            wiki_link TEXT,
             UNIQUE(name)
         );`
     )
@@ -106,11 +109,13 @@ async function setupDb() {
         `CREATE TABLE IF NOT EXISTS albums (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            folder_name TEXT,
             favorited BOOLEAN NOT NULL,
             year INTEGER,
-            wiki TEXT,
             length INTEGER,
             disk_count INTEGER,
+            wiki TEXT,
+            wiki_link TEXT,
             UNIQUE(name)
         );`
     )
@@ -121,6 +126,7 @@ async function setupDb() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             wiki TEXT,
+            wiki_link TEXT,
             UNIQUE(name)
         );`
     )
@@ -210,15 +216,15 @@ async function setupDb() {
     )
     
 }
-setupDb();
+await setupDb();
 
 // TABLES
-async function addTrack(name, duration, track_artist, track_album, disk_number) {
+async function addTrack(name, duration, track_artist, track_album, disk_number, file_name) {
   try {
     await db.run(
-      `INSERT OR IGNORE INTO tracks (name, favorited, duration, track_artist, track_album, disk_number) 
-       VALUES (?, ?, ?, ?, ?, ?);`,
-      [name, false, duration, track_artist, track_album, disk_number]
+      `INSERT OR IGNORE INTO tracks (name, favorited, duration, track_artist, track_album, disk_number, file_name) 
+       VALUES (?, ?, ?, ?, ?, ?, ?);`,
+      [name, false, duration, track_artist, track_album, disk_number, file_name]
     );
     // console.log(`track "${name}" added with`);
   } catch (error) {
@@ -226,43 +232,102 @@ async function addTrack(name, duration, track_artist, track_album, disk_number) 
   } 
 }
 
-async function addArtist(name, born, country, wiki) {
+async function addArtist(artistName) {
   try {
-    await db.run(
-      `INSERT OR IGNORE INTO artists (name, favorited, born, country, wiki) 
-       VALUES (?, ?, ?, ?, ?);`,
-      [name, false, born, country, wiki]
-    );
-    // console.log(`artist "${name}" added`);
+    const existing = await db.get(
+      `SELECT name FROM artists WHERE folder_name = ?`,
+      [artistName]
+    )
+
+    if (!existing) {
+      const artistData = await fetchArtistData(artistName);
+      const artistWiki = await fetchArtistWiki(artistName);
+
+      await db.run(
+        `INSERT OR IGNORE INTO artists (name, folder_name, favorited, born, country, wiki, wiki_link) 
+        VALUES (?, ?, ?, ?, ?, ?, ?);`,
+        [artistData.name, artistName, false, artistData['life-span'].begin, artistData.area.name, artistWiki.summary, artistWiki.page]
+      )
+      
+      if(artistData.aliases) {
+        for (let i = 0; i < artistData.aliases; i++) {
+          await addAlias(artistData.aliases.name, artistName);
+        }
+      }
+      const artistTags = getTop5(artistData.tags);
+      if (artistTags) {
+        for (let i = 0; i < artistTags.length; i++) {
+          await addGenre(artistTags[i], null)
+          await addArtistGenre(artistName, artistTags[i])
+        }
+      }
+      return artistData.name;
+    }
+    else {
+      const existing = await db.get(
+        `SELECT name FROM artists WHERE folder_name = ?`,
+        [artistName]
+      )
+      return existing.name;
+    }
   } catch (error) {
-    console.error(`couldn't add artist "${name}" :`, error);
+    console.error(`couldn't add artist "${artistName}" :`, error);
+  }
+}
+
+async function addAlbum(albumName, artistName, artistNameFromData, length, disk_count) {
+  try {
+    const existing = await db.get(
+      `SELECT name FROM albums WHERE folder_name = ?`,
+      [albumName]
+    )
+    if(!existing) {
+      const albumData = await fetchAlbumData(albumName, artistNameFromData);
+      const albumWiki = await fetchAlbumWiki(albumName, artistName);
+
+      await db.run(
+        `INSERT OR IGNORE INTO albums (name, folder_name, favorited, year, length, disk_count, wiki, wiki_link) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+        [albumData.title, albumName, false, albumData.date.split("-")[0], length, disk_count, albumWiki.summary, albumWiki.page]
+      );
+
+      const albumTags = await fetchAlbumTags(albumName, artistNameFromData).then(tags => getTop5(tags));
+      if (albumTags) {
+        for (let i = 0; i < albumTags.length; i++) {
+          await addGenre(albumTags[i]);
+          await addAlbumGenre(albumName, albumTags[i])
+        }
+      }
+
+      return albumTags;
+    }
+
+  } catch (error) {
+    console.error(`couldn't add album "${albumName}" :`, error);
   } 
 }
 
-async function addAlbum(name, year, wiki, length, disk_count) {
-  try {
-    await db.run(
-      `INSERT OR IGNORE INTO albums (name, favorited, year, wiki, length, disk_count) 
-       VALUES (?, ?, ?, ?, ?, ?);`,
-      [name, false, year, wiki, length, disk_count]
-    );
-    // console.log(`album "${name}" added`);
-  } catch (error) {
-    console.error(`couldn't add album "${name}" :`, error);
-  } 
-}
 
-async function addGenre(name, wiki) {
+async function addGenre(genreName) {
   try {
-    await db.run(
-      `INSERT OR IGNORE INTO genres (name, wiki) 
-       VALUES (?, ?);`,
-      [name, wiki]
+    const existing = await db.get(
+      `SELECT * FROM genres WHERE name = ?`,
+      [genreName]
     );
-    // console.log(`genre "${name}" added`);
+    
+    if (!existing) {
+      const wiki = await fetchGenreWiki(genreName);
+
+      await db.run(
+        `INSERT OR IGNORE INTO genres (name, wiki, wiki_link) 
+         VALUES (?, ?, ?);`,
+        [genreName, wiki.summary, wiki.page]
+      );
+
+    }
   } catch (error) {
-    console.error(`couldn't add track "${name}" :`, error);
-  } 
+    console.error(`couldn't add genre "${genreName}" :`, error);
+  }
 }
 
 // LINKS
@@ -387,27 +452,6 @@ async function addAlias(alias, artistName) {
   }
 }
 
-// TODO Jest tests ?
-// TODO more tests ?
-// --- TESTS ---
-// await addTrack("aurora", 279, "björk", "vespertine")
-// await addArtist("björk", null, "1965-11-21", "iceland", "björk's wiki")
-// await addAlbum("vespertine", 2001, "verpertine's wiki", 3341)
-// await addGenre("electronic", "electronic's wiki")
-
-// await addTrack("man in the box", 286, "alice in chains", "facelift")
-// await addArtist("alice in chains", 1987, null, "usa", "alice in chains's wiki")
-// await addAlbum("facelift", 1990, null, 3251)
-// await addGenre("grunge", "grunge's wiki")
-
-// await addTrackArtist("man in the box", "alice in chains")
-// await addTrackAlbum("man in the box", "facelift")
-// await addArtistAlbum("alice in chains", "facelift")
-// await addTrackGenre("man in the box", "grunge")
-// await addArtistGenre("alice in chains", "grunge")
-// await addAlbumGenre("facelift", "grunge")
-
-
 const extensions = ["flac", "mp3", "aiff", "aac", "ape", "asf", "bwf", "dsdiff", "dsf", "mp2", "mka", "mkv", "mpc", "mp4", "m4a", "m4v", "ogg", "webm", "wv", "wma", "wav"] // i don't know most of these...
 async function scanMusicFiles(dir) {
   try {
@@ -417,38 +461,11 @@ async function scanMusicFiles(dir) {
       if (artist.isDirectory()) {
         try {
           const artistName = artist.name;
-          let artistNameFromData = artist.name; // this is because to request the album data, it's better to use the name from musicbrainz
           const artistPath = path.join(dir, artistName);
           const albums = await fs.promises.readdir(artistPath, { withFileTypes: true });
 
           console.log("***** ", artistName, " *****")
-
-          // TODO doesn't need to call the api if it's already in the database but sqlite3 doesn't allow async fucntion calls (aka fetch) inside db.get
-          // the idea would be to use triggers so that the database updates its infos on its own but how to do api call inside sql ???
-          // i just look at it, it's not possible => find someway else
-          try {
-            const artistData = await fetchArtistData(artistName)
-            artistNameFromData = artistData.name;
-            await addArtist(artistName, artistData["life-span"].begin, artistData.area.name, null);
-  
-            if(artist.aliases) {
-              for (let i = 0; i < artistData.aliases; i++) {
-                await addAlias(artistData.aliases.name, artistName);
-              }
-            }
-            const artistTags = getTop5(artistData.tags);
-            if (artistTags) {
-              for (let i = 0; i < artistTags.length; i++) {
-                await addGenre(artistTags[i], null)
-                await addArtistGenre(artistName, artistTags[i])
-              }
-            }
-
-          } catch (err) {
-            console.error(artistName, err);
-          }
-
-
+          const artistNameFromData = await addArtist(artistName)
           
           for (const album of albums) {
             if (album.isDirectory()) {
@@ -459,19 +476,12 @@ async function scanMusicFiles(dir) {
                 let albumDuration = 0;
                 let diskCount = 1; 
 
-                console.log("      ", albumName)
+                console.log(" =", albumName)
 
-                const albumTags = await fetchAlbumTags(albumName, artistNameFromData).then(tags => getTop5(tags));
-                if (albumTags) {
-                  for (let i = 0; i < albumTags.length; i++) {
-                    await addGenre(albumTags[i], null);
-                  }
-                }
-                
                 for (const track of tracks) {
                   if (track.isFile()) {
                     const trackName = track.name;
-                    const filePath = path.join(albumPath, track.name);
+                    const filePath = path.join(albumPath, trackName);
                     
                     if (extensions.includes(filePath.split(".").pop().toLocaleLowerCase())) { 
                       try {
@@ -479,17 +489,11 @@ async function scanMusicFiles(dir) {
 
                         albumDuration += metadata.format.duration;
 
-                        await addTrack(metadata.common.title, Number.parseInt(metadata.format.duration), metadata.common.albumartist || metadata.common.artist, metadata.common.album, metadata.common.disk.no || 1)
+                        await addTrack(metadata.common.title, Number.parseInt(metadata.format.duration), metadata.common.albumartist || metadata.common.artist, metadata.common.album, metadata.common.disk.no || 1, trackName)
                         await addTrackArtist(metadata.common.title, artistName);
-                        await addTrackAlbum(metadata.common.albumartist || metadata.common.artist);
+                        await addTrackAlbum(metadata.common.title, albumName);
 
                         diskCount = Math.max(diskCount, metadata.common.disk.of);
-
-                        if (albumTags) {
-                          for (let i = 0; i < albumTags.length; i++) {
-                            await addTrackGenre(metadata.common.title, albumTags[i])
-                          }
-                        }
 
                       } catch(err) { 
                           console.log("couldn't read music file", err)
@@ -502,28 +506,21 @@ async function scanMusicFiles(dir) {
                   }
                 }
 
-                // TODO doesn't need to call the api if it's already in the database but sqlite3 doesn't allow async fucntion calls (aka fetch) inside db.get 
-                const albumData = await fetchAlbumData(albumName, artistNameFromData)
-                await addAlbum(albumName, albumData.date.split("-")[0], null, Number.parseInt(albumDuration), diskCount);
+                await addAlbum(albumName, artistName, artistNameFromData, Number.parseInt(albumDuration), diskCount);
                 await addArtistAlbum(artistName, albumName);
-                
-                if (albumTags) {
-                  for (let i = 0; i < albumTags.length; i++) {
-                    await addAlbumGenre(albumName, albumTags[i])
-                  }
-                }
+
               } catch(err) {
-                console.log("couldn't read album folder", err);
+                console.log("error in album folder", err);
               }
             }
           }
         } catch(err) {
-            console.log("couldn't read artist folder", err);
+            console.log("error in artist folder", err);
         }
       }
     }
   } catch(err) {
-      console.error("couldn' read main folder", err);
+      console.error("error in main folder", err);
   } finally {
       await db.close();
   }

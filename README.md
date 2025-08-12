@@ -1,23 +1,19 @@
 # Radiance (WIP)
 
-> This is a work in progress. web-based music streaming server with a frontend built using **React** and **Vite**.
+This is a work in progress.
 
----
-
-## Overview
-
-This application aims to provide a lightweight and responsive music streaming service.
+Radiance is a self-hosted, web-based music streaming server with a **React** powered frontend. It lets you to stream the music from your server to any device.
 
 ---
 
 ## Requirements
 
-To run or build this project, you will need:
+To run or test this project, you will need:
 
 - **Node.js** : use lts
 - **npm** or `pnpm` / `yarn` as alternatives
-- A web interface
-- A backend music streaming API or local JSON dataset
+- **sqlite3**
+- A music folder organized as such : folder > artist > album > song+cover
 
 > Make sure you're in a UNIX-compatible environment (Linux/macOS/WSL) for consistent file path and CLI behavior.
 
@@ -34,5 +30,7 @@ To run or build this project, you will need:
 ## How to test it ?
 
 Run ```npm install``` in both frontend and backend directories.
+
 Run ```npm run dev``` in the frontend folder.
+
 Run ```node ./index.js``` in the backend folder.

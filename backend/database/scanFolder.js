@@ -57,7 +57,9 @@ async function scanMusicFiles(dir) {
                         albumDuration += metadata.format.duration;
 
                         await addTrack(metadata.common.title, Number.parseInt(metadata.format.duration), metadata.common.albumartist || metadata.common.artist, metadata.common.album, metadata.common.disk.no || 1, trackName)
+                        // console.log("add tracks_artists : ", metadata.common.title, artistName)
                         await addTrackArtist(metadata.common.title, artistName);
+                        // console.log("add tracks_albums : ", metadata.common.title, albumName)
                         await addTrackAlbum(metadata.common.title, albumName);
 
                         diskCount = Math.max(diskCount, metadata.common.disk.of);
@@ -88,6 +90,8 @@ async function scanMusicFiles(dir) {
     }
     
     console.log("database generation succesful")
+
+
   } catch(err) {
       console.error("error in main folder", err);
   } 

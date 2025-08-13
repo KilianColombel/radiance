@@ -40,7 +40,6 @@ export async function clearDatabase() {
     );
 }
 
-// TODO issue with favorites for multiple users...
 export async function setupDb() {
     await createDB();
 
@@ -82,7 +81,6 @@ export async function setupDb() {
     )
 
     // aliases table for better search (ex "Parannoul" == "파란노을" == "Huremic" == "Mydreamfever" == "lastar" == "끝이별" ...)
-    // TODO maybe should do the same for albums if it's available on musicbrainz
     await db.exec(
        `CREATE TABLE IF NOT EXISTS aliases (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,11 +119,58 @@ export async function setupDb() {
             UNIQUE(name)
         );`
     )
+    
+    // users table : useless for now
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            picture TEXT,
+            is_admin BOOLEAN,
+            can_edit BOOLEAN,
+            UNIQUE(name)
+        );`
+    )
+
+    // playlists table
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS playlists (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            UNIQUE(name)
+        );`
+    )
+
+    // playlists_tracks : link between tracks and playlists
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS playlists_tracks (
+            playlist_id INTEGER NOT NULL,
+            track_id INTEGER NOT NULL,
+
+            PRIMARY KEY (playlist_id, track_id),
+
+            FOREIGN KEY (playlist_id) REFERENCES playlists(id),
+            FOREIGN KEY (track_id) REFERENCES tracks(id)
+        );`
+    )
+
+    // favorites
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS favorites (
+            track_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+
+            PRIMARY KEY (track_id, user_id),
+
+            FOREIGN KEY (track_id) REFERENCES tracks(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );`
+    )
 
 
     // --- LINKS BETWEEN TABLES --- 
 
-    // tracks_artists [0..*]<-->[1] : every track has an artist related to it (grandparent folder), but an artist folder can be empty
+    // tracks_artists : every track has an artist related to it (grandparent folder), but an artist folder can be empty
     await db.exec(
         `CREATE TABLE IF NOT EXISTS tracks_artists (
             track_id INTEGER NOT NULL,
@@ -138,7 +183,7 @@ export async function setupDb() {
         );`
     )
     
-    // tracks_albums [0..*]<-->[1] : every track has an album related to it (parent folder), but an album folder can be empty
+    // tracks_albums : every track has an album related to it (parent folder), but an album folder can be empty
     await db.exec(
         `CREATE TABLE IF NOT EXISTS tracks_albums (
             track_id INTEGER NOT NULL,
@@ -150,10 +195,7 @@ export async function setupDb() {
             FOREIGN KEY (album_id) REFERENCES albums(id)
         );`
     )
-    
-    // TODO tracks_playlists : every playlist can be empty and a song may not be added to any playlist
 
-    
     // artists_albums :
     await db.exec(
         `CREATE TABLE IF NOT EXISTS artists_albums (
@@ -205,6 +247,8 @@ export async function setupDb() {
             FOREIGN KEY (genre_id) REFERENCES genres(id)
         );`
     )
+
+    await db.close();
     
     console.log("database tables generated");
 }

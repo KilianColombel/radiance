@@ -47,8 +47,8 @@ export async function addArtist(artistName) {
       )
       
       if(artistData.aliases) {
-        for (let i = 0; i < artistData.aliases; i++) {
-          await addAlias(artistData.aliases.name, artistName);
+        for (let i = 0; i < artistData.aliases.length; i++) {
+          await addAlias(artistData.aliases[i].name, artistName);
         }
       }
       const artistTags = getTop5(artistData.tags);
@@ -148,12 +148,14 @@ export async function addTrackArtist(trackName, artistName) {
     driver: sqlite3.Database
   });
 
+  console.log(trackName, artistName)
+
   try {
     const result = await db.run(
       `INSERT OR IGNORE INTO tracks_artists (track_id, artist_id) 
        VALUES (
          (SELECT id FROM tracks WHERE name = ?),
-         (SELECT id FROM artists WHERE name = ?)
+         (SELECT id FROM artists WHERE folder_name = ?)
        );`,
       [trackName, artistName]
     );
@@ -176,7 +178,7 @@ export async function addTrackAlbum(trackName, albumName) {
       `INSERT OR IGNORE INTO tracks_albums (track_id, album_id) 
        VALUES (
          (SELECT id FROM tracks WHERE name = ?),
-         (SELECT id FROM albums WHERE name = ?)
+         (SELECT id FROM albums WHERE folder_name = ?)
        );`,
       [trackName, albumName]
     );
@@ -198,8 +200,8 @@ export async function addArtistAlbum(artistName, albumName) {
     const result = await db.run(
       `INSERT OR IGNORE INTO artists_albums (artist_id, album_id) 
        VALUES (
-         (SELECT id FROM artists WHERE name = ?),
-         (SELECT id FROM albums WHERE name = ?)
+         (SELECT id FROM artists WHERE folder_name = ?),
+         (SELECT id FROM albums WHERE folder_name = ?)
        );`,
       [artistName, albumName]
     );
@@ -277,7 +279,6 @@ async function addAlbumGenre(albumName, genreName) {
     await db.close();
   }
 }
-
 
 async function addAlias(alias, artistName) {
   const db = await open({

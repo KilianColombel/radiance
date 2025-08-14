@@ -31,10 +31,9 @@ await scanMusicFiles(config.musicDirectory)
 //       ...
 
 // api 
-import playlistsRouter from "./routes/playlists.js";
-app.use("/api/playlist", playlistsRouter);
-/* import audioFilesRouter from "./routes/audioFiles.js";
-app.use("/api/audio", audioFilesRouter); */
+
+import apiRouter from './routes/api.js'
+app.use('/api', apiRouter)
 
 app.listen(port, () => {
   console.log(`server started at : http://localhost:${port}`);

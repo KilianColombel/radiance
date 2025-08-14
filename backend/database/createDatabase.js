@@ -2,15 +2,22 @@ import fs from 'fs';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const databasePath = path.join(__dirname, 'radiance.db');
+
 
 async function createDB() {
-    const filePath = "./database/radiance.db";
     try {
-        if (fs.existsSync(filePath)) {
+        if (fs.existsSync(databasePath)) {
             console.log("database file already exists")
         }
         else {
-            await fs.promises.writeFile(filePath, "", "utf8")
+            await fs.promises.writeFile(databasePath, "", "utf8")
             console.log("database file has been created")
         }
     } catch (err) {
@@ -20,7 +27,7 @@ async function createDB() {
 
 export async function clearDatabase() {
     const db = await open({
-        filename: './database/radiance.db',
+        filename: databasePath,
         driver: sqlite3.Database
     });
 
@@ -44,7 +51,7 @@ export async function setupDb() {
     await createDB();
 
     const db = await open({
-        filename: './database/radiance.db',
+        filename: databasePath,
         driver: sqlite3.Database
     });
     

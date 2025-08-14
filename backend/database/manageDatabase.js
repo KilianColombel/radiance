@@ -4,10 +4,18 @@ import { open } from 'sqlite';
 import { fetchArtistData, fetchAlbumData, fetchAlbumTags, getTop5 } from './fetchDataFromInternet.js';
 import { fetchArtistWiki, fetchAlbumWiki, fetchGenreWiki } from './fetchDataFromInternet.js';
 
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const databasePath = path.join(__dirname, 'radiance.db');
+
 
 export async function addTrack(name, duration, track_artist, track_album, disk_number, file_name) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -26,7 +34,7 @@ export async function addTrack(name, duration, track_artist, track_album, disk_n
 
 export async function addArtist(artistName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -76,7 +84,7 @@ export async function addArtist(artistName) {
 
 export async function addAlbum(albumName, artistName, artistNameFromData, length, disk_count) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -114,7 +122,7 @@ export async function addAlbum(albumName, artistName, artistNameFromData, length
 
 async function addGenre(genreName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -144,7 +152,7 @@ async function addGenre(genreName) {
 
 export async function addTrackArtist(trackName, artistName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -167,7 +175,7 @@ export async function addTrackArtist(trackName, artistName) {
 
 export async function addTrackAlbum(trackName, albumName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -190,7 +198,7 @@ export async function addTrackAlbum(trackName, albumName) {
 
 export async function addArtistAlbum(artistName, albumName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -212,7 +220,7 @@ export async function addArtistAlbum(artistName, albumName) {
 
 async function addTrackGenre(trackName, genreName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -235,7 +243,7 @@ async function addTrackGenre(trackName, genreName) {
 
 async function addArtistGenre(artistName, genreName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -258,7 +266,7 @@ async function addArtistGenre(artistName, genreName) {
 
 async function addAlbumGenre(albumName, genreName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -280,7 +288,7 @@ async function addAlbumGenre(albumName, genreName) {
 
 async function addAlias(alias, artistName) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -299,7 +307,7 @@ async function addAlias(alias, artistName) {
 
 export async function addUser(userName, picPath, isAdmin, canEdit) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -318,7 +326,7 @@ export async function addUser(userName, picPath, isAdmin, canEdit) {
 
 export async function addPlaylist(playlistName, thumbnailPath) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -337,7 +345,7 @@ export async function addPlaylist(playlistName, thumbnailPath) {
 
 export async function addTrackToPlaylist(playlistID, trackID) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -356,7 +364,7 @@ export async function addTrackToPlaylist(playlistID, trackID) {
 
 export async function addUserToPlaylist(playlistID, userID) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -375,7 +383,7 @@ export async function addUserToPlaylist(playlistID, userID) {
 
 export async function addTrackToFavorites(trackID, userID) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -394,7 +402,7 @@ export async function addTrackToFavorites(trackID, userID) {
 
 export async function addArtistToFavorites(artistID, userID) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 
@@ -413,7 +421,7 @@ export async function addArtistToFavorites(artistID, userID) {
 
 export async function addAlbumToFavorites(albumID, userID) {
   const db = await open({
-    filename: './database/radiance.db',
+    filename: databasePath,
     driver: sqlite3.Database
   });
 

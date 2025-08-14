@@ -4,7 +4,7 @@ import { open } from 'sqlite';
 
 
 async function createDB() {
-    const filePath = "./radiance.db";
+    const filePath = "./database/radiance.db";
     try {
         if (fs.existsSync(filePath)) {
             console.log("database file already exists")
@@ -20,7 +20,7 @@ async function createDB() {
 
 export async function clearDatabase() {
     const db = await open({
-        filename: './radiance.db',
+        filename: './database/radiance.db',
         driver: sqlite3.Database
     });
 
@@ -44,7 +44,7 @@ export async function setupDb() {
     await createDB();
 
     const db = await open({
-        filename: './radiance.db',
+        filename: './database/radiance.db',
         driver: sqlite3.Database
     });
     
@@ -239,6 +239,7 @@ export async function setupDb() {
         );`
     )
     
+    // TODO not used for now: should create a trigger to add albums genres to the track's genres
     // tracks_genres : a track may not have a genre (unsufficient data), a genre may have been added related to a artist or album and may not have a single related track
     await db.exec(
         `CREATE TABLE IF NOT EXISTS tracks_genres (
@@ -278,6 +279,21 @@ export async function setupDb() {
         );`
     )
 
+    // view to make the tracks query easier and faster
+    // TODO duplicate ids can appear but sql view can specify unique key
+    await db.exec(
+        `CREATE VIEW IF NOT EXISTS track_infos AS
+         SELECT tracks.id AS track_id, tracks.name AS track_name, 
+                artists.id AS artist_id, artists.folder_name AS artist_folder, 
+                albums.id AS album_id, albums.folder_name AS album_folder,
+                tracks.duration, tracks.file_name
+         FROM tracks
+         JOIN tracks_artists ON tracks_artists.track_id = tracks.id
+         JOIN artists ON tracks_artists.artist_id = artists.id
+         JOIN tracks_albums ON tracks_albums.track_id = tracks.id
+         JOIN albums ON tracks_albums.album_id = albums.id;
+        `
+    )
     await db.close();
     
     console.log("database tables generated");

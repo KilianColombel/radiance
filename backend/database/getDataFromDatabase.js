@@ -1,32 +1,76 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
+const db = await open({
+  filename: './database/radiance.db',
+  driver: sqlite3.Database
+});
 
 export async function getAllTracks() {
+  try {
+    const res = await db.all(
+      `SELECT * from track_infos 
+       JOIN playlists_tracks 
+       ON playlists_tracks.track_id = track_infos.track_id;`
+    );
+    for (let i = 0; i < res.length; i++) {
+      res[i].location = [res[i].artist_folder, res[i].album_folder, res[i].file_name].join("/")
+    }
+    db.close();
+    return res;
+  } catch (err) {
+    console.error("couldn't retrieve the data from the database : ", err);
+    db.close();
+    return null;
+  }
+}
+// getAllTracks().then(data => console.log(data))
+
+export async function getTracksFromPlaylist(playlistID) {  
+  try {
+    const res = await db.all(
+      `SELECT * from track_infos 
+       JOIN playlists_tracks 
+       ON playlists_tracks.track_id = track_infos.track_id
+       WHERE playlists_tracks.playlist_id = ?;`,
+       [playlistID]
+    );
+    for (let i = 0; i < res.length; i++) {
+      res[i].location = [res[i].artist_folder, res[i].album_folder, res[i].file_name].join("/")
+    }
+    db.close();
+    return res;
+  } catch (err) {
+    console.error("couldn't retrieve the data from the database : ", err);
+    db.close();
+    return null;
+  }
+}
+// getTracksFromPlaylist(1).then(data => console.log(data))
+
+export async function getFavoriteTracks(userID) {
   const db = await open({
-    filename: './radiance.db',
+    filename: './database/radiance.db',
     driver: sqlite3.Database
   });
   
   try {
-    /* SELECT tracks.name, artists.folder_name, albums.folder_name, tracks.duration FROM tracks JOIN tracks_artists ON tracks_artists.track_id = tracks.id JOIN artists ON tracks_artists.artist_id = artists.id JOIN artists_albums ON artists_albums.artist_id = artists.id JOIN albums ON artists_albums.album_id = albums.id; */
     const res = await db.all(
-      `SELECT tracks.name, artists.folder_name AS artist, albums.folder_name AS album, tracks.duration, tracks.file_name AS location FROM tracks
-       JOIN tracks_artists ON tracks_artists.track_id = tracks.id
-       JOIN artists ON tracks_artists.artist_id = artists.id
-       JOIN artists_albums ON artists_albums.artist_id = artists.id
-       JOIN albums ON artists_albums.album_id = albums.id;`
+      `SELECT * from track_infos 
+       JOIN favorite_tracks 
+       ON favorite_tracks.track_id = track_infos.track_id
+       WHERE favorite_tracks.user_id = ?;`,
+       [userID]
     );
     for (let i = 0; i < res.length; i++) {
-      res[i].location = [res[i].artist, res[i].album, res[i].location].join("/")
+      res[i].location = [res[i].artist_folder, res[i].album_folder, res[i].file_name].join("/")
     }
-    res.forEach(track => {
-    });
+    db.close();
     return res;
   } catch (err) {
     console.error("couldn't retrieve the data from the database : ", err);
+    db.close();
     return null;
   }
 }
-
-getAllTracks().then(data => console.log(data))
+// getFavoriteTracks(1).then(data => console.log(data))

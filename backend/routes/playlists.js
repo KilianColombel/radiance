@@ -1,5 +1,5 @@
 import { Router } from "express";
-const trackListRouter = Router();
+const playlistsRouter = Router();
 
 
 const musicPath = "../../music";
@@ -20,7 +20,7 @@ const playlist2 = [
   { id: 5, title: 'Body Behavior', artist: 'Deafheaven', album: 'Lonely People With Power', duration: '5:23', isFavorite: false },
 ];
 
-trackListRouter.get('/:id', (req, res) => {
+playlistsRouter.get('/:id', (req, res) => {
   switch (req.params.id) {
     case "example-1":
       res.json(playlist1);
@@ -39,4 +39,4 @@ trackListRouter.get('/:id', (req, res) => {
   }
 })
 
-export default trackListRouter;
+export default playlistsRouter;

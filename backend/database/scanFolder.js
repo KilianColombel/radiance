@@ -4,7 +4,7 @@ import { parseFile } from 'music-metadata';
 
 import { setupDb } from './createDatabase.js';
 import { addTrack, addArtist, addAlbum, addTrackArtist, addTrackAlbum, addArtistAlbum } from './manageDatabase.js'
-
+import { addUser, addPlaylist, addTrackToPlaylist, addUserToPlaylist, addTrackToFavorites, addArtistToFavorites, addAlbumToFavorites } from './manageDatabase.js'
 
 const musicDirectory = '../../../music'; 
 // the music directory should look like this :

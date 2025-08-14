@@ -1,8 +1,8 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
-import { fetchArtistData, fetchAlbumData, fetchAlbumTags, getTop5 } from './fetchData.js';
-import { fetchArtistWiki, fetchAlbumWiki, fetchGenreWiki } from './fetchData.js';
+import { fetchArtistData, fetchAlbumData, fetchAlbumTags, getTop5 } from './fetchDataFromInternet.js';
+import { fetchArtistWiki, fetchAlbumWiki, fetchGenreWiki } from './fetchDataFromInternet.js';
 
 
 export async function addTrack(name, duration, track_artist, track_album, disk_number, file_name) {
@@ -294,6 +294,139 @@ async function addAlias(alias, artistName) {
     );
   } catch (err) {
     console.error(`couldn't add alias ${alias} for artist with id : ${artistName}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addUser(userName, picPath, isAdmin, canEdit) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO users (name, picture, is_admin, can_edit) 
+       VALUES (?, ?, ?, ?);`,
+      [userName, picPath, isAdmin, canEdit]
+    );
+  } catch (err) {
+    console.error(`couldn't add user ${userName}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addPlaylist(playlistName, thumbnailPath) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO playlists (name, thumbnail_path) 
+       VALUES (?, ?);`,
+      [playlistName, thumbnailPath]
+    );
+  } catch (err) {
+    console.error(`couldn't add user ${playlistName}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addTrackToPlaylist(playlistID, trackID) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO playlists_tracks (playlist_id, track_id) 
+       VALUES (?, ?);`,
+      [playlistID, trackID]
+    );
+  } catch (err) {
+    console.error(`couldn't add track ${trackID} to playlist ${playlistID}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addUserToPlaylist(playlistID, userID) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO playlists_users (playlist_id, user_id) 
+       VALUES (?, ?);`,
+      [playlistID, userID]
+    );
+  } catch (err) {
+    console.error(`couldn't add user ${userID} to playlist ${playlistID}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addTrackToFavorites(trackID, userID) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO favorite_tracks (track_id, user_id) 
+       VALUES (?, ?);`,
+      [trackID, userID]
+    );
+  } catch (err) {
+    console.error(`couldn't add track ${trackID} to favorites for user with id : ${userID}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addArtistToFavorites(artistID, userID) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO favorite_artists (artist_id, user_id) 
+       VALUES (?, ?);`,
+      [artistID, userID]
+    );
+  } catch (err) {
+    console.error(`couldn't add artist ${artistID} to favorites for user with id : ${userID}`)
+  }finally {
+    await db.close();
+  }
+}
+
+export async function addAlbumToFavorites(albumID, userID) {
+  const db = await open({
+    filename: './radiance.db',
+    driver: sqlite3.Database
+  });
+
+  try {
+    await db.run(
+      `INSERT OR IGNORE INTO favorite_albums (album_id, user_id) 
+       VALUES (?, ?);`,
+      [albumID, userID]
+    );
+  } catch (err) {
+    console.error(`couldn't add album ${albumID} to favorites for user with id : ${userID}`)
   }finally {
     await db.close();
   }

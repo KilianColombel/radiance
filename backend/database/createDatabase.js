@@ -137,6 +137,7 @@ export async function setupDb() {
         `CREATE TABLE IF NOT EXISTS playlists (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
+            thumbnail_path TEXT,
             UNIQUE(name)
         );`
     )
@@ -154,15 +155,44 @@ export async function setupDb() {
         );`
     )
 
-    // favorites
+    // playlists_users : link between users and playlists
     await db.exec(
-        `CREATE TABLE IF NOT EXISTS favorites (
-            track_id INTEGER NOT NULL,
+        `CREATE TABLE IF NOT EXISTS playlists_users (
+            playlist_id INTEGER NOT NULL,
             user_id INTEGER NOT NULL,
 
-            PRIMARY KEY (track_id, user_id),
+            PRIMARY KEY (playlist_id, user_id),
 
+            FOREIGN KEY (playlist_id) REFERENCES playlists(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );`
+    )
+
+    // favorites
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS favorite_tracks (
+            track_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            PRIMARY KEY (track_id, user_id),
             FOREIGN KEY (track_id) REFERENCES tracks(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );`
+    )
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS favorite_artists (
+            artist_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            PRIMARY KEY (artist_id, user_id),
+            FOREIGN KEY (artist_id) REFERENCES artists(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );`
+    )
+    await db.exec(
+        `CREATE TABLE IF NOT EXISTS favorite_albums (
+            album_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            PRIMARY KEY (album_id, user_id),
+            FOREIGN KEY (album_id) REFERENCES albums(id),
             FOREIGN KEY (user_id) REFERENCES users(id)
         );`
     )

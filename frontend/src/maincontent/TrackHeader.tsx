@@ -1,4 +1,4 @@
-import { type SortConfig, type SortKey } from './MainContent.tsx'; 
+import { type SortConfig, type SortKey } from './TrackList.tsx'; 
 
 interface TrackHeaderProps {
   onSort: (key: SortKey) => void;

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { type Track } from '../../../common/types.ts'
-import './MainContent.css';
+import './TrackList.css';
 import TrackHeader from './TrackHeader.tsx';
 import { TrackRow } from './TrackRow.tsx';
 import { stringToSeconds } from '../misc/handleTime.ts';
@@ -17,7 +17,7 @@ export interface SortConfig {
 }
 
 
-function MainContent() {
+function TrackList() {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, order: 'asc' });
   const { id } = useParams();
@@ -95,4 +95,4 @@ function MainContent() {
   );
 };
 
-export default MainContent;
+export default TrackList;

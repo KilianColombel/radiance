@@ -6,7 +6,7 @@ import './App.css'
 
 import Header from './header/Header.tsx';
 import SidePanel from './sidepanel/SidePanel.tsx';
-import MainContent from './maincontent/MainContent.tsx';
+import MainContent from './maincontent/TrackList.tsx';
 import Player from './player/Player.tsx';
 
 function App() {

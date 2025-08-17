@@ -5,25 +5,26 @@ import { type Track } from '../../../common/types.ts'
 import './TrackList.css';
 import TrackHeader from './TrackHeader.tsx';
 import { TrackRow } from './TrackRow.tsx';
-import { stringToSeconds } from '../misc/handleTime.ts';
 
 
-export type SortKey = keyof Omit<Track, 'id' | 'isFavorite'>; // keys to sort on
 type SortOrder = 'asc' | 'desc';
-
+export type SortKey = keyof Omit<Track, 'track_id' | 'artist_id' | 'album_id' | 'album_folder' | 'file_name'>; // keys to sort on
 export interface SortConfig {
   key: SortKey | null;
   order: SortOrder;
 }
 
+interface TrackListProps {
+  onTrackSelect: (id: number) => number;
+}
 
-function TrackList() {
+function TrackList({ onTrackSelect } : TrackListProps) {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, order: 'asc' });
   const { id } = useParams();
 
   function loadTracks(listID: string) {
-    fetch(`http://localhost:1234/api/playlist/${listID}`)
+    fetch(`http://localhost:1234/api/tracks`)
       .then(res => res.json())
       .then(data => setTracks(data));
   }
@@ -43,11 +44,12 @@ function TrackList() {
         const bValue = b[sortConfig.key!];
 
         let comparison = 0;
-        if (sortConfig.key === 'duration') {
-          comparison = stringToSeconds(aValue) - stringToSeconds(bValue);
+        if (typeof aValue === "number" && typeof bValue === "number"){
+          comparison = aValue - bValue;
+
         }
         else {
-          comparison = aValue.localeCompare(bValue);
+          comparison = String(aValue).localeCompare(String(bValue));
         }
 
         return sortConfig.order === 'asc' ? comparison : -comparison;
@@ -56,15 +58,16 @@ function TrackList() {
     return sortableTracks;
   }, [tracks, sortConfig]);
 
-  function handleToggleFavorite(trackId: number) {
+  // TODO this is broken
+  /* function handleToggleFavorite(trackId: number) {
     setTracks(prevTracks =>
       prevTracks.map(track =>
-        track.id === trackId
+        track.track_id === trackId
           ? { ...track, isFavorite: !track.isFavorite }
           : track
       )
     );
-  };
+  }; */
 
   function handleSort(key: SortKey) {
     let order: SortOrder = 'asc';
@@ -86,9 +89,10 @@ function TrackList() {
       
       {sortedTracks.map((track) => (
         <TrackRow
-          key={track.id}
+          key={track.track_id}
           track={track}
-          onToggleFavorite={handleToggleFavorite}
+          onTrackClick={onTrackSelect}
+          onToggleFavorite={() => {}}
         />
       ))}
     </div>

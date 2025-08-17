@@ -2,48 +2,35 @@ import { useState, useRef } from 'react';
 
 import { type Track } from '../../../common/types.ts'
 import FavoriteIcon from '../misc/FavoriteIcon.tsx';
+import { secondsToString } from '../misc/handleTime.ts';
 
 
 interface TrackRowProps {
     track: Track;
+    onTrackClick: (id: number) => number;
     onToggleFavorite: (trackId: number) => void;
 }
 
-export function TrackRow({track, onToggleFavorite}: TrackRowProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
+export function TrackRow({track, onTrackClick, onToggleFavorite}: TrackRowProps) {
   
-  const audioRef = useRef<HTMLAudioElement>(null);
-
-  function togglePlayPause() {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  
 
   const handleToggle = () => {
-    onToggleFavorite(track.id);
+    onToggleFavorite(track.track_id);
   };
-
-  const audioSrc = `http://localhost:1234/api/audio/${track.id}`;
   
   return (
     <div className='track-container'>
-      <audio ref={audioRef} src={audioSrc} onEnded={() => setIsPlaying(false)}></audio>
 
       <FavoriteIcon
-        isFavorite={track.isFavorite}
+        isFavorite={false}
         onToggleFavorite={handleToggle}
       />
-      <div className='play-container' onClick={togglePlayPause}>
-        <div className='track-title'>{track.title}</div>
-        <div className='track-artist'>{track.artist}</div>
-        <div className='track-album'>{track.album}</div>
-        <div className='track-duration'>{track.duration}</div>
+      <div className='play-container' onClick={() => onTrackClick(track.track_id)}>
+        <div className='track-title'>{track.track_name}</div>
+        <div className='track-artist'>{track.artist_folder}</div>
+        <div className='track-album'>{track.album_folder}</div>
+        <div className='track-duration'>{secondsToString(track.duration)}</div>
       </div>
     </div>
   );

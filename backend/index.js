@@ -20,16 +20,14 @@ app.use(express.json());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-if (process.env.NODE_ENV === "developpement") {
-  const configPath = process.env.MUSIC_PATH;
-  var config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+if (process.env.NODE_ENV === "development") {
+  var musicPath = process.env.MUSIC_PATH;
 } else {
   const configPath = path.join(__dirname, 'config.json');
-  var config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  var musicPath = JSON.parse(fs.readFileSync(configPath, 'utf-8')).musicDirectory;
 }
 
-await scanMusicFiles(config.musicDirectory)
+await scanMusicFiles(musicPath)
 // the music directory should look like this :
 // music_folder/
 //   L artist_folder/
@@ -52,5 +50,5 @@ import apiRouter from './routes/api.js'
 app.use('/api', apiRouter)
 
 app.listen(port, () => {
-  console.log(`server started at : http://localhost:${port}`);
+  console.log(`${process.env.NODE_ENV} : server started at : http://localhost:${port}`);
 });

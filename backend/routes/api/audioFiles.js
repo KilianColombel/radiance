@@ -5,15 +5,21 @@ import { fileURLToPath } from 'url';
 import { Router } from "express";
 const audioFilesRouter = Router();
 
+import dotenv from "dotenv";
+dotenv.config();
+
 import { getTrackByID } from '../../database/getDataFromDatabase.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-const configPath = path.join(__dirname, '..', '..', 'config.json');
-const musicDirectory = JSON.parse(fs.readFileSync(configPath, 'utf-8')).musicDirectory;
+if (process.env.NODE_ENV === "development") {
+    var musicDirectory = process.env.MUSIC_PATH;
+} else {
+    const configPath = path.join(__dirname, '..', '..', 'config.json');
+    var musicDirectory = JSON.parse(fs.readFileSync(configPath, 'utf-8')).musicDirectory;
+}
 
 audioFilesRouter.get('/:id', async (req, res) => {
     try {

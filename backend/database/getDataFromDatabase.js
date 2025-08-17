@@ -102,7 +102,7 @@ export async function getTracksFromPlaylist(playlistName) {
     db.close();
   }
 }
-getTracksFromPlaylist("test_playlist").then(data => console.log(data))
+// getTracksFromPlaylist("test_playlist").then(data => console.log(data))
 
 export async function getFavoriteTracks(userID) {
   const db = await open({

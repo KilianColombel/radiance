@@ -15,7 +15,7 @@ export interface SortConfig {
 }
 
 interface TrackListProps {
-  onTrackSelect: (id: number) => number;
+  onTrackSelect: () => number;
 }
 
 function TrackList({ onTrackSelect } : TrackListProps) {

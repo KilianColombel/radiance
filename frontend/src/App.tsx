@@ -31,11 +31,14 @@ function App() {
   // HANDLE AUDIO
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  function handleTrackSelection() {
+  const [currSongID, setCurrSongID] = useState<number>();
+  function handleTrackSelection(id: number) {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
+        console.log(`http://localhost:1234/api/audio/${currSongID}`)
+        setCurrSongID(id)
         audioRef.current.play();
       }
       setIsPlaying(!isPlaying);
@@ -44,7 +47,7 @@ function App() {
 
   return (
     <div className='app-container'>
-      <audio ref={audioRef} src={`http://localhost:1234/api/audio/${2}`} onEnded={() => setIsPlaying(false)}></audio>
+      <audio ref={audioRef} src={`http://localhost:1234/api/audio/${currSongID}`} onEnded={() => setIsPlaying(false)}></audio>
 
 
       <Header searchText={searchText} onSearchChange={handleSearchChange} />

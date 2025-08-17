@@ -13,6 +13,9 @@ interface TrackRowProps {
 
 export function TrackRow({track, onTrackClick, onToggleFavorite}: TrackRowProps) {
   
+  function togglePlayPause() {
+    onTrackClick(track.track_id)
+  }
   
 
   const handleToggle = () => {
@@ -26,7 +29,7 @@ export function TrackRow({track, onTrackClick, onToggleFavorite}: TrackRowProps)
         isFavorite={false}
         onToggleFavorite={handleToggle}
       />
-      <div className='play-container' onClick={() => onTrackClick(track.track_id)}>
+      <div className='play-container' onClick={togglePlayPause}>
         <div className='track-title'>{track.track_name}</div>
         <div className='track-artist'>{track.artist_folder}</div>
         <div className='track-album'>{track.album_folder}</div>

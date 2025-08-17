@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { customizeGlobalCursorStyles, type CustomCursorStyleConfig } from "react-resizable-panels";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -32,16 +32,37 @@ function App() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currSongID, setCurrSongID] = useState<number>();
+
+  // triggered everytime currSongID changes
+  useEffect(() => {
+    if (currSongID && audioRef.current) {
+        audioRef.current.onloadeddata = () => {
+            audioRef.current?.play();
+            setIsPlaying(true);
+        };
+    }
+  }, [currSongID]);
+
+  function togglePlayPause() {
+    if (audioRef?.current) {
+      console.log("oui")
+    }
+    if (!isPlaying) {
+      audioRef?.current?.play();
+      setIsPlaying(true);
+    }
+    else {
+      audioRef?.current?.pause();
+      setIsPlaying(false)
+    }
+  }
+
   function handleTrackSelection(id: number) {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        console.log(`http://localhost:1234/api/audio/${currSongID}`)
-        setCurrSongID(id)
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+    if (id === currSongID) {
+      togglePlayPause();
+    } 
+    else {
+      setCurrSongID(id);
     }
   };
 

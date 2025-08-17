@@ -6,7 +6,7 @@ import './App.css'
 
 import Header from './header/Header.tsx';
 import SidePanel from './sidepanel/SidePanel.tsx';
-import MainContent from './maincontent/TrackList.tsx';
+import TrackList from './maincontent/TrackList.tsx';
 import Player from './player/Player.tsx';
 
 function App() {
@@ -41,7 +41,7 @@ function App() {
         <Panel >
           <BrowserRouter>
             <Routes>
-              <Route path="/list/:id" element={<MainContent />} />
+              <Route path="/list/:id" element={<TrackList />} />
             </Routes>
           </BrowserRouter>
         </Panel>

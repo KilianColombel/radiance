@@ -5,6 +5,9 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 
+import dotenv from "dotenv";
+dotenv.config();
+
 import { scanMusicFiles } from './database/scanFolder.js';
 
 
@@ -17,10 +20,15 @@ app.use(express.json());
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const configPath = path.join(__dirname, 'config.json');
 
-const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-// TODO this should be an api call and the location chosen from frontend
+if (process.env.NODE_ENV === "developpement") {
+  const configPath = process.env.MUSIC_PATH;
+  var config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+} else {
+  const configPath = path.join(__dirname, 'config.json');
+  var config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+}
+
 await scanMusicFiles(config.musicDirectory)
 // the music directory should look like this :
 // music_folder/
@@ -31,6 +39,14 @@ await scanMusicFiles(config.musicDirectory)
 //       ...
 
 // api 
+
+process.on('uncaughtException', (err) => {
+  console.error('Erreur non capturée:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Rejet non géré:', reason);
+});
 
 import apiRouter from './routes/api.js'
 app.use('/api', apiRouter)

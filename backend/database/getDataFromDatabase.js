@@ -76,7 +76,11 @@ export async function getTracksFromPlaylist(playlistName) {
 
   try {
     const res = await db.all(
-      `SELECT * from track_infos 
+      `SELECT 
+         track_infos.track_id, track_infos.track_name, track_infos.artist_id, 
+         track_infos.artist_folder, track_infos.album_id, track_infos.album_folder, 
+         track_infos.duration, file_name
+         FROM track_infos 
        JOIN playlists_tracks ON playlists_tracks.track_id = track_infos.track_id
        JOIN playlists ON playlists.id = playlists_tracks.playlist_id
        WHERE playlists.name = ?;`,
@@ -90,7 +94,7 @@ export async function getTracksFromPlaylist(playlistName) {
     for (let i = 0; i < res.length; i++) {
       res[i].location = [res[i].artist_folder, res[i].album_folder, res[i].file_name].join("/")
     }
-    return res;
+    return {thumbnail_path: null, playlist_name: null, res};
     
   } catch (err) {
     throw new Error(err);
@@ -98,7 +102,7 @@ export async function getTracksFromPlaylist(playlistName) {
     db.close();
   }
 }
-// getTracksFromPlaylist("test_playlist").then(data => console.log(data))
+getTracksFromPlaylist("test_playlist").then(data => console.log(data))
 
 export async function getFavoriteTracks(userID) {
   const db = await open({
@@ -108,7 +112,11 @@ export async function getFavoriteTracks(userID) {
 
   try {
     const res = await db.all(
-      `SELECT * from track_infos 
+      `SELECT 
+         track_infos.track_id, track_infos.track_name, track_infos.artist_id, 
+         track_infos.artist_folder, track_infos.album_id, track_infos.album_folder, 
+         track_infos.duration, file_name
+         FROM track_infos 
        JOIN favorite_tracks 
        ON favorite_tracks.track_id = track_infos.track_id
        WHERE favorite_tracks.user_id = ?;`,

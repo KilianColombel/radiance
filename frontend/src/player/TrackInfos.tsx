@@ -4,8 +4,6 @@ interface TrackInfosProps {
   track: {
     title: string;
     artist: string;
-    artworkUrl: string;
-    isFavorite: boolean;
   };
   onToggleFavorite: () => void;
 }
@@ -13,13 +11,13 @@ interface TrackInfosProps {
 function TrackInfos({ track, onToggleFavorite } : TrackInfosProps) {
   return (
     <div className='left-infos'>
-      <img src={track.artworkUrl} alt={track.title} />
+      <img src={""} alt={track.title} />
       <div className='item-infos'>
         <div className='title-name'>{track.title}</div>
         <div className='artist-name'>{track.artist}</div>
       </div>
       <FavoriteIcon 
-        isFavorite={track.isFavorite} 
+        isFavorite={false} 
         onToggleFavorite={onToggleFavorite} 
       />
     </div>

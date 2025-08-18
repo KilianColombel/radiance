@@ -1,46 +1,54 @@
-import { useState } from 'react';
 import Slider from 'rc-slider';
 
 import './Slider.css';
 import { secondsToString } from '../misc/handleTime';
 
 interface PlayerControlsProps {
-  duration: number;
+  cnt_duration: number;
+  cnt_currTime: number;
+  cnt_isPlaying: boolean;
+  cnt_onPlayPause: () => void;
+  cnt_onSkipStart: () => void;
+  cnt_onSkipEnd: () => void;
+  cnt_onProgressChange: (newTime: number) => void;
 }
 
-function PlayerControls({ duration }: PlayerControlsProps) {
-  const [currPlaytime, setCurrPlaytime] = useState(0);
+function PlayerControls({ 
+  cnt_duration,
+  cnt_currTime,
+  cnt_isPlaying,
+  cnt_onPlayPause,
+  cnt_onSkipStart,
+  cnt_onSkipEnd,
+  cnt_onProgressChange
+}: PlayerControlsProps) {
 
   function handlePlaytime(value: number | number[]) {
     if(typeof value === "number") {
-      setCurrPlaytime(value);
+      cnt_onProgressChange(value);
     }
     else {
-      // shouldn't happend since there's only one handle...
-      throw new Error("Wrong input time in the slider...")
+      // shouldn't happen since there's only one handle...
+      throw new Error("Wrong input type in the slider...")
     }
-
-    // update stuff here
   }
 
   return (
     <div className='middle-controls'>
       <div className='controls-container'>
-        <i className="bi bi-skip-start"></i>
-        <i className="bi bi-play"></i>
-        <i className="bi bi-skip-end"></i>
+        <i className="bi bi-skip-start" onClick={cnt_onSkipStart}></i>
+        <i className={`bi ${cnt_isPlaying ? 'bi-pause' : 'bi-play'}`} onClick={cnt_onPlayPause}></i>
+        <i className="bi bi-skip-end" onClick={cnt_onSkipEnd}></i>
       </div>
       <div className='progress-slider'>
-        <div>{secondsToString(currPlaytime)}</div>
+        <div>{secondsToString(cnt_currTime)}</div>
         <Slider 
-          value={currPlaytime}
-          // TODO no idea why there's a warning here...
+          value={cnt_currTime}
           onChange={handlePlaytime}
-          max={duration}
+          max={cnt_duration}
           min={0}
         />
-        {/* duration = 100 : default slider max value */}
-        <div>{secondsToString(100)}</div>
+        <div>{secondsToString(cnt_duration)}</div>
       </div>
     </div>
   );

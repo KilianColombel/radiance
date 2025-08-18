@@ -7,7 +7,7 @@ import { secondsToString } from '../misc/handleTime.ts';
 
 interface TrackRowProps {
     track: Track;
-    onTrackClick: (id: number) => number;
+    onTrackClick: (id: number) => void;
     onToggleFavorite: (trackId: number) => void;
 }
 

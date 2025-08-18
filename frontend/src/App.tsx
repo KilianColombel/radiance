@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { customizeGlobalCursorStyles, type CustomCursorStyleConfig } from "react-resizable-panels";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -22,7 +22,7 @@ function App() {
    }, []);
 
 
-  // HANDLE
+  // HANDLE SEARCH BAR
   const [searchText, setSearchText] = useState<string>('');
   function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
@@ -31,22 +31,19 @@ function App() {
   // HANDLE AUDIO
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currSongID, setCurrSongID] = useState<number>();
-
+  const [currSongID, setCurrSongID] = useState<number>(1);
   // triggered everytime currSongID changes
   useEffect(() => {
     if (currSongID && audioRef.current) {
         audioRef.current.onloadeddata = () => {
+          if(isPlaying) {
             audioRef.current?.play();
             setIsPlaying(true);
+          }
         };
     }
   }, [currSongID]);
-
   function togglePlayPause() {
-    if (audioRef?.current) {
-      console.log("oui")
-    }
     if (!isPlaying) {
       audioRef?.current?.play();
       setIsPlaying(true);
@@ -56,15 +53,81 @@ function App() {
       setIsPlaying(false)
     }
   }
-
   function handleTrackSelection(id: number) {
     if (id === currSongID) {
       togglePlayPause();
     } 
     else {
+      setIsPlaying(true);
+      setCurrentTime(0);
       setCurrSongID(id);
     }
   };
+
+  // HANDLE CONTROLS
+  const [currTime, setCurrentTime] = useState(0);
+  const [currVolume, setCurrVolume] = useState(Number(localStorage.getItem("volume")) || 0.5);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = currVolume;
+      localStorage.setItem("volume", JSON.stringify(currVolume))
+    }
+
+  }, [currVolume]);
+
+  const [currTrack, setCurrTrack] = useState("Track");
+  const [currArtist, setCurrArtist] = useState("Artist");
+  // TODO get the currDuration
+  const [currDuration, setDuration] = useState(200);
+
+  const handlePlayPause = useCallback(() => {
+    togglePlayPause();
+  }, [isPlaying]);
+  const handleSkipStart = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+    setCurrentTime(0);
+  }, []);
+  const handleSkipEnd = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = currDuration;
+    }
+    setCurrentTime(currDuration);
+  }, [currDuration]);
+  const handleProgressChange = useCallback((newTime: number) => {
+    if (audioRef.current){
+      audioRef.current.currentTime = newTime;
+    }
+    setCurrentTime(newTime);
+  }, []);
+  const handleVolumeChange = useCallback((newVolume: number) => {
+    if (audioRef.current){
+      audioRef.current.volume = newVolume;
+    }
+    setCurrVolume(newVolume);
+  }, []);
+
+  useEffect(() => {
+    // this manages the timer
+    let intervalId = 0;
+    if (isPlaying && currTime < currDuration) {
+      intervalId = setInterval(() => {
+        setCurrentTime(prevTime => {
+          if (prevTime + 1 >= currDuration) {
+            setIsPlaying(false);
+            return currDuration;
+          }
+          return prevTime + 1;
+        });
+      }, 1000);
+    }
+    // remove timers that would run in parallel
+    return () => clearInterval(intervalId);
+  }, [isPlaying, currTime, currDuration]);
+
+
 
   return (
     <div className='app-container'>
@@ -88,7 +151,19 @@ function App() {
           </BrowserRouter>
         </Panel>
       </PanelGroup>
-      <Player></Player>      
+      <Player
+        currTitle={currTrack}
+        currArtist={currArtist}
+        currDuration={currDuration}
+        currTime={currTime}
+        currVolume={currVolume}
+        isPlaying={isPlaying}
+        onPlayPause={handlePlayPause}
+        onSkipStart={handleSkipStart}
+        onSkipEnd={handleSkipEnd}
+        onProgressChange={handleProgressChange}
+        onVolumeChange={handleVolumeChange}
+      />      
     </div>
   )
 }

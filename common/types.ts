@@ -8,3 +8,17 @@ export interface Track {
   duration : number; 
   file_name : string; 
 }
+
+export interface PlayerProps {
+  currTitle: string;
+  currArtist: string;
+  currDuration: number;
+  currTime: number;
+  currVolume: number;
+  isPlaying: boolean;
+  onPlayPause: () => void;
+  onSkipStart: () => void;
+  onSkipEnd: () => void;
+  onProgressChange: (newTime: number) => void;
+  onVolumeChange: (newVolume: number) => void;
+}

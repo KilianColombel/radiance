@@ -9,13 +9,15 @@ import { TrackRow } from './TrackRow.tsx';
 
 type SortOrder = 'asc' | 'desc';
 export type SortKey = keyof Omit<Track, 'track_id' | 'artist_id' | 'album_id' | 'album_folder' | 'file_name'>; // keys to sort on
+
+
 export interface SortConfig {
   key: SortKey | null;
   order: SortOrder;
 }
 
 interface TrackListProps {
-  onTrackSelect: () => number;
+  onTrackSelect: (id: number) => void;
 }
 
 function TrackList({ onTrackSelect } : TrackListProps) {

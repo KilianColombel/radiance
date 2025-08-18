@@ -8,7 +8,7 @@ import { TrackRow } from './TrackRow.tsx';
 
 
 type SortOrder = 'asc' | 'desc';
-export type SortKey = keyof Omit<Track, 'track_id' | 'artist_id' | 'album_id' | 'album_folder' | 'file_name'>; // keys to sort on
+type SortKey = 'title' | 'artist' | 'album' | 'duration'; // keys to sort on
 
 
 export interface SortConfig {
@@ -42,15 +42,18 @@ function TrackList({ onTrackSelect } : TrackListProps) {
     
     if (sortConfig.key !== null) {
       sortableTracks.sort((a, b) => {
-        const aValue = a[sortConfig.key!];
-        const bValue = b[sortConfig.key!];
-
         let comparison = 0;
-        if (typeof aValue === "number" && typeof bValue === "number"){
+        console.log(sortConfig['order'])
+        if (sortConfig.key == 'duration') {
+          const aValue = a['duration'];
+          const bValue = b['duration'];
           comparison = aValue - bValue;
-
         }
+        
         else {
+          const sortKey = sortConfig.key == 'title' ? 'track_name' : sortConfig.key == 'artist' ? 'artist_folder' : 'album_folder';
+          const aValue = a[sortKey];
+          const bValue = b[sortKey];
           comparison = String(aValue).localeCompare(String(bValue));
         }
 

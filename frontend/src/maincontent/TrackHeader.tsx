@@ -12,9 +12,9 @@ function TrackHeader({ onSort, sortConfig }: TrackHeaderProps) {
       return null;
     }
     if (sortConfig.order === 'asc') {
-      return <i className="bi bi-chevron-down"></i>;
+      return <i className="bi bi-chevron-up"></i>;
     }
-    return <i className="bi bi-chevron-up"></i>;
+    return <i className="bi bi-chevron-down"></i>;
   };
 
   return (

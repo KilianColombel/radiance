@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { customizeGlobalCursorStyles, type CustomCursorStyleConfig } from "react-resizable-panels";
+import { customizeGlobalCursorStyles, type CustomCursorStyleConfig, getPanelElement } from "react-resizable-panels";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
 
@@ -10,7 +10,7 @@ import TrackList from './maincontent/TrackList.tsx';
 import Player from './player/Player.tsx';
 
 function App() {
-  // HANDLE SEPARATOR CURSOR
+  // HANDLE PANELS CURSOR
   useLayoutEffect(() => {
      function customCursor({ isPointerDown }: CustomCursorStyleConfig) {
        return isPointerDown ? "grabbing" : "grab";
@@ -20,6 +20,34 @@ function App() {
        customizeGlobalCursorStyles(null);
      };
    }, []);
+  
+
+  // HANDLE ABSOLUTE UNITS PANELS
+  const [width, setWidth] =  useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+    };
+
+    // Ajouter l'écouteur
+    window.addEventListener("resize", handleResize);
+
+    // Nettoyer l'écouteur quand le composant est démonté
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+  const minSizePixels = 100;
+  const minSizePercentage = minSizePixels / width * 100;
+
+  const maxSizePixels = 300;
+  const maxSizePercentage = maxSizePixels / width * 100;
+  
+  const defaultSizePixels = 200;
+  const defaultSizePercentage = defaultSizePixels / width * 100;
+
+  const collapsedSize = 50;
+  const collapsedSizePercentage = collapsedSize / width * 100;
 
 
   // HANDLE SEARCH BAR
@@ -27,6 +55,7 @@ function App() {
   function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(event.target.value);
   };
+
 
   // HANDLE AUDIO
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -63,6 +92,7 @@ function App() {
       setCurrSongID(id);
     }
   };
+
 
   // HANDLE CONTROLS
   const [currTime, setCurrentTime] = useState(0);
@@ -128,6 +158,7 @@ function App() {
   }, [isPlaying, currTime, currDuration]);
 
 
+  console.log(collapsedSize)
 
   return (
     <div className='app-container'>
@@ -139,7 +170,7 @@ function App() {
         {/* TODO this needs an absolute collapsedSize to keep consistency across screen sizes but the units="pixels" property isn't supported anymore it seems
             should i revert to a previous version or make it myself
          */}
-        <Panel collapsible={true} collapsedSize={4} defaultSize={20} minSize={10} maxSize={30}>
+        <Panel id="side-panel" collapsible={true} collapsedSize={collapsedSizePercentage} minSize={minSizePercentage} maxSize={maxSizePercentage} defaultSize={defaultSizePercentage}>
           <SidePanel></SidePanel>
         </Panel>
         <PanelResizeHandle className='resize-handle'/>

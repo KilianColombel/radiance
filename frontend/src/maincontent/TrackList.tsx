@@ -8,7 +8,7 @@ import { TrackRow } from './TrackRow.tsx';
 
 
 type SortOrder = 'asc' | 'desc';
-type SortKey = 'title' | 'artist' | 'album' | 'duration'; // keys to sort on
+export type SortKey = 'title' | 'artist' | 'album' | 'duration'; // keys to sort on
 
 
 export interface SortConfig {

@@ -2,9 +2,7 @@
 
 This is a work in progress.
 
-Radiance is a self-hosted, web-based music streaming server with a **React** powered frontend. It lets you to stream the music from your server to any device.
-
----
+Radiance is a self-hosted, web-based music streaming server with a **React** powered frontend and an **Express** powered backend. It lets you to stream the music from your server to any device via a web browser.
 
 ## Requirements
 
@@ -17,20 +15,10 @@ To run or test this project, you will need:
 
 > Make sure you're in a UNIX-compatible environment (Linux/macOS/WSL) for consistent file path and CLI behavior.
 
----
-
-## External packages
-
-[react-resizable-panels](https://github.com/bvaughn/react-resizable-panels)
-
-[rc-slider](https://github.com/schrodinger/rc-slider)
-
-[react-router-dom](https://github.com/remix-run/react-router)
-
 ## How to test it ?
 
 Run ```npm install``` in both frontend and backend directories.
 
-Run ```npm run dev``` in the frontend folder.
+Run ```npm run dev``` in both frontend and backend directories.
 
-Run ```node ./index.js``` in the backend folder.
+Go to ```http://localhost:1234``` to test.

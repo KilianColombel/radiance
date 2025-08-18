@@ -22,7 +22,7 @@ function App() {
   const { searchText, handleSearchChange } = searchBar();
 
   useEffect (() => {
-    controls.setCurrTrack("Track")
+    controls.setCurrTrack("Test")
     controls.setCurrArtist("Artist")
     controls.setCurrCoverPath("Cover.jpg")
   }, [])
